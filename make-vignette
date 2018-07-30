@@ -1,0 +1,6 @@
+#!/usr/bin/Rscript
+# pour générer la vignette
+
+rmarkdown::render("Fantasio.Rmd", rmarkdown::md_document(preserve_yaml=TRUE, toc=TRUE), output_file="../Fantasio/vignettes/Fantasio.Rmd", output_dir="../Fantasio/vignettes/")
+
+
