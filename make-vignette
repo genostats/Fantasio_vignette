@@ -1,6 +1,8 @@
-#!/usr/bin/Rscript
+#!/bin/bash
 # pour générer la vignette
 
-rmarkdown::render("Fantasio.Rmd", rmarkdown::md_document(preserve_yaml=TRUE, toc=TRUE), output_file="../Fantasio/vignettes/Fantasio.Rmd", output_dir="../Fantasio/vignettes/")
+Rscript -e "rmarkdown::render(\"Fantasio.Rmd\", rmarkdown::md_document(preserve_yaml=TRUE, toc=TRUE))"
+cp --preserve Fantasio.md ../Fantasio/vignettes/Fantasio.Rmd
+rsync -a Fantasio_files ../Fantasio/vignettes/
 
 
