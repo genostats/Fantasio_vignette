@@ -26,10 +26,10 @@ vignette: %\VignetteIndexEntry{Vignette Title} %\VignetteDepends{Fantasio}
     -   [Principal concepts](#principal-concepts)
 -   [1. Getting started](#getting-started)
     -   [1.1 Installation](#installation)
-    -   [1.2 Input data file](#input-data-file)
+    -   [1.2 Input HGDP-CEPH data file](#input-hgdp-ceph-data-file)
     -   [1.3 Creation of the bed matrix](#creation-of-the-bed-matrix)
--   [2. Wrapper](#wrapper)
-    -   [2.1 By Hotspots](#by-hotspots)
+-   [2. Running Fantasio](#running-fantasio)
+    -   [2.1 By Hotspots (Default)](#by-hotspots-default)
     -   [2.2 By Hotspots by Segments](#by-hotspots-by-segments)
     -   [2.3 By Distance](#by-distance)
     -   [2.4 How to use the segment.option
@@ -50,15 +50,15 @@ vignette: %\VignetteIndexEntry{Vignette Title} %\VignetteDepends{Fantasio}
 Introduction
 ------------
 
-Fantasio is composed of several functions. Its goals are for:
+Fantasio is composed of several functions. Its goals are:
 
--   Population genetic studies (estimating and detecting inbreeding on
-    individuals without known genealogy, estimating the population
+-   For population genetic studies: estimating and detecting inbreeding
+    on individuals without known genealogy, estimating the population
     proportion of mating types and the individual probability to be
-    offspring of different mating types)
--   Rare disease studies (performing homozygosity mapping
-    with heterogeneity)
--   Multifactorial disease studies (HBD-GWAS strategy).
+    offspring of different mating types
+-   For rare disease studies: performing homozygosity mapping with
+    heterogeneity
+-   For multifactorial disease studies: HBD-GWAS strategy
 
 Fantasio implements the creation of several random sparse submaps on
 genome-wide data (to remove linkage disequilibrium). It also provides
@@ -101,8 +101,8 @@ strategy has the advantage of not requiring any LD computation on the
 sample and of minimizing loss of information, as compared with a
 strategy that based on a single map of markers in minimal LD.
 
-Fantasio also computes the likelihood of a mating type. These
-likelihoods can be used for:
+Fantasio statistical framework allows fixing HMM parameters to compute
+the likelihood of a mating type. These likelihoods can be used for:
 
 -   Inferring an individual as inbred by comparing the maximized
     likelihood with the one to be outbred with a likelihood ratio test
@@ -133,8 +133,8 @@ With the following parameters :
 
 -   \\(Y_{m,s}^{(i)}\\) the observed genotype of individual *i* at
     marker *m* on submap *s*
--   \\(H_{1}\\) the hypothesis where \\(Y_{m,s}^{(i)}\\) is linked to
-    the disease, and \\(H_{0}\\) the one where it is not
+-   \\(H_{1}\\) the hypothesis where marker \\(m\\) is linked to the
+    disease, and \\(H_{0}\\) the one where it is not
 -   \\(X_{m,s}^{(i)}\\) the HBD status of individual *i* at marker *m*
     on submap *s* that is estimated together with the inbreeding
     coefficient using the HMM of the package
@@ -170,9 +170,9 @@ package gaston, please make sure to have it installed.
 
 Please refer to the vignette of this package for more information.
 
-Since we explained the concept behind the package let's make an usage
-example of it. For this we will use the data furnish by the package
-HGDP.
+Since we explained the concept behind the package let's make a usage
+example of it. For this we will use the data provided in the package
+HGDP-CEPH.
 
 ### 1.1 Installation
 
@@ -203,7 +203,7 @@ After doing that we will need to run the following commands :
     ## 
     ##     LdFlags
 
-    ## Gaston set number of threads to 4. Use setThreadOptions() to modify this.
+    ## Gaston set number of threads to 8. Use setThreadOptions() to modify this.
 
     ## 
     ## Attaching package: 'gaston'
@@ -216,27 +216,28 @@ After doing that we will need to run the following commands :
     ## 
     ##     cbind, rbind
 
+### 1.2 Input HGDP-CEPH data file
+
     install.packages("HGDP.CEPH", repos="https://genostats.github.io/R/") 
 
     require(HGDP.CEPH)
 
     ## Loading required package: HGDP.CEPH
 
-### 1.2 Input data file
-
-From now on, we can use the package. Let us first create our bed.matrix
-object using the data file we load with the package HGDP.CEPH.
+From now on, we can use the package.
 
     filepath <-system.file("extdata", "hgdp_ceph.bed", package="HGDP.CEPH")
 
 ### 1.3 Creation of the bed matrix
 
-First create your bed.matrix object with this command :
+Let us first create a bed.matrix object (see gaston package for details)
+for the data file we loaded from the package HGDP.CEPH with this command
+:
 
     x <- read.bed.matrix(filepath)
 
-    ## Reading /home/rv/R/R-3.4/HGDP.CEPH/extdata/hgdp_ceph.rds 
-    ## Reading /home/rv/R/R-3.4/HGDP.CEPH/extdata/hgdp_ceph.bed
+    ## Reading /ext/home/haupe/R/x86_64-pc-linux-gnu-library/3.4/HGDP.CEPH/extdata/hgdp_ceph.rds 
+    ## Reading /ext/home/haupe/R/x86_64-pc-linux-gnu-library/3.4/HGDP.CEPH/extdata/hgdp_ceph.bed
 
 This command returns an updated 'bed.matrix' object (refer to gaston
 vignette for more informations and function documentation) :
@@ -327,52 +328,69 @@ needed with :
 
 This object contains two slots :
 
--   ped : which gives you informations about all the individuals in the
-    chip
--   snps : which gives you informations about the snps itself
+-   ped : which gives you information about all the individuals in the
+    data
+-   snps : which gives you information about the snps themselves
 
 More information in the vignette of the gaston package.
 
-2. Wrapper
-----------
+2. Running Fantasio
+-------------------
 
 We created a wrapper to make the usage of the package more simple.
 
-The following function calls two different functions :
-`createSegmentsListBySnps` and `createSegmentsListBySnps`. The first
-function `createSegmentsListBySnps` is used to create a list of segments
-though the genome. The second function `makeAllSubmapsBySnps` or
-`makeAllSubsmapsbyHotspots` is used to create submaps.
+We implemented in the package two differents methods in order to create
+n submaps :
 
-The `segments` arguments accept only two options : Hotspots or Distance
-which correspond to the method implemented in the package.
+-   By "Hotspots" : with this method we use a file of recombination
+    hotspots (downloaded from the HapMap website in hg17 (\*)) to
+    segment the genome. Segments should contain at least
+    number\_of\_marker markers. Markers are then randomly selected
+    within each segment along the genome. By doing this process we
+    obtain a submap (a list of marker). The recombination hotspots have
+    been converted to other buid (hg18, hg19) using hgLiftOver. The
+    default recombination hotspots file used is in hg19. (\*)
+    <http://hapmap.ncbi.nlm.nih.gov/downloads/recombination/2006-10_rel21_phaseI+II/hotspots>
 
-We implemented in the package Fantasio two differents methods in order
-to create the submaps :
+-   By "Distance" : with this method we use a fix step based on genetic
+    or physiscal distance (0.5 cM by default) to pick a marker randomly
+    along the genome. More technically, segments are created whenever
+    there is a gap larger than the step (0.5 cM) between
+    adjacent markers. Each segment is then subdivided in
+    several mini-segments. By default we create 20 mini-segments, each
+    containing at least 50 markers. If this is not possible (not enough
+    markers), we do not create mini-segments. After this process is
+    done, we loop over the mini-segments, pick a random marker and walk
+    through the mini-segments by picking the nearest marker after taking
+    a step (default 0.5 cM) downstream and upstream the mini-segments.
 
--   By "Hotspots" : \*With this method we use a hotspots files to
-    segment our genome, each segment contains several markers. Once this
-    step is done we then loop over the segments and pick one
-    marker randomly. By  
-    doing this process we obtain a submap (a list of marker).
+The wrapper calls two different functions : `createSegmentsListBySnps`
+and `createSegmentsListBySnps`. The first function
+`createSegmentsListBySnps` is used to create a list of segments though
+the genome. The second function `makeAllSubmapsBySnps` or
+`makeAllSubsmapsbyHotspots` is used to create the submaps.
 
--   By "Distance" : \*With this method we use the gaps between markers
-    to segment our data, each segment contains several  
-    markers. We then create mini-segments for each marker (by default we
-    create 20 segments, each containing at least 50 markers, if the
-    creation of 20 segments in each we have 50 markers is impossible we
-    do not create mini-segments). After this process is done, we loop
-    over the mini-segments, pick a random marker and go through the
-    mini-segments by picking the nearest marker after taking a step
-    (default is 0,5 cM) downstream and upstream the mini-segments.
+### 2.1 By Hotspots (Default)
 
-### 2.1 By Hotspots
+By default, the submaps are created using the file of recombination
+hotspots and summarizing the results for each snp.
 
-    submaps2 <- Fantasio(bedmatrix=x.me, segments="Hotspot", n=5, verbose=FALSE, list.id = "all") 
+    submaps2 <- Fantasio(bedmatrix=x.me, segments="Hotspots", n=5, verbose=FALSE, list.id = "all") 
+
+We require that at least n.consecutive.marker markers are HBD before
+calling a HBD segment. Default value for n.consecutive.marker=5.
+
+Here we need to use argument list.id = "all" because we do not have
+phenotype information for the HGDP-CEPH individuals. By default,
+Fantasio focuses on affected individuals only (status = 2).
 
 ### 2.2 By Hotspots by Segments
 
-    submaps3 <- Fantasio(bedmatrix=x, segments="Hotspots", n=100, n.cores=20, recap.by.segments=TRUE, n.consecutive.marker=1, list.id = "all")
+For the hotspots option, results can be summarized globally for each
+segment (recap.by.segments=TRUE). For this reason, n.consecutive.marker
+should be set to 1.
+
+    submaps3 <- Fantasio(bedmatrix=x.me, segments="Hotspots", n=5, recap.by.segments=TRUE, verbose=FALSE, n.consecutive.marker=1, list.id = "all")
 
 ### 2.3 By Distance
 
@@ -384,11 +402,16 @@ In order to use the `segment.option` argument you need to pass a list of
 arguments, each variable names in the list must be an argument name in
 the function. The function that will be called is either
 `createsSegmentsListBySnps` if `segments` argument is equal to
-"Distance" or `createSegmentsListByHotspots`if `segments` argument is
-equal to "Hotspots" and the arguments list will be pass to it.
+"Distance" or `createSegmentsListByHotspots` if `segments` argument is
+equal to "Hotspots" and the arguments list will be passed to it.
 
     l <- list(number_of_marker=50) #default is 0
     submaps5 <- Fantasio(bedmatrix=x, segments="Hotspots", segment.options=l, n=5, recap.by.segments=TRUE, list.id = "all")
+
+In the case of "Hotspots", by default, we do not require to have a
+minimum number of markers in each hotspots segments (number\_of\_marker
+= 0). With the above command line, we impose to have at least 50 markers
+in each segment.
 
 3. Step by step usage of the package Fantasio
 ---------------------------------------------
@@ -552,20 +575,20 @@ description of each structure in this object :
 
     head(submaps@submap_summary)
 
-    ##         FID       IID STATUS SUBMAPS QUALITY       F_MIN       F_MAX
-    ## 1 HGDP00607 HGDP00607      1   5 / 5     100 0.019871212 0.031541238
-    ## 2 HGDP00608 HGDP00608      1   5 / 5     100 0.036929595 0.041122815
-    ## 3 HGDP00609 HGDP00609      1   5 / 5     100 0.039033231 0.043588668
-    ## 4 HGDP00610 HGDP00610      1   5 / 5     100 0.047351750 0.057783542
-    ## 5 HGDP00611 HGDP00611      1   1 / 5      20 0.008597126 0.008597126
-    ## 6 HGDP00612 HGDP00612      1   5 / 5     100 0.055262272 0.064545913
-    ##        F_MEAN    F_MEDIAN   A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
-    ## 1 0.024969147 0.023725097 0.15197107 5.717995e-26   TRUE             5
-    ## 2 0.038305015 0.037526806 0.06729407 4.731140e-61   TRUE             5
-    ## 3 0.041414674 0.041457950 0.11258395 9.931170e-50   TRUE             5
-    ## 4 0.052951953 0.052768073 0.16159346 1.617061e-64   TRUE             5
-    ## 5 0.008597126 0.008597126 0.81693401 2.553957e-02   TRUE             1
-    ## 6 0.060982058 0.062759170 0.34121097 1.140623e-39   TRUE             5
+    ##         FID       IID STATUS SUBMAPS QUALITY      F_MIN      F_MAX
+    ## 1 HGDP00607 HGDP00607      1   5 / 5     100 0.01993197 0.02706728
+    ## 2 HGDP00608 HGDP00608      1   5 / 5     100 0.03763491 0.03905816
+    ## 3 HGDP00609 HGDP00609      1   5 / 5     100 0.03884944 0.04655960
+    ## 4 HGDP00610 HGDP00610      1   5 / 5     100 0.04836224 0.05451063
+    ## 5 HGDP00611 HGDP00611      1   1 / 5      20 0.00000000 0.00000000
+    ## 6 HGDP00612 HGDP00612      1   5 / 5     100 0.05192440 0.07965833
+    ##       F_MEAN   F_MEDIAN   A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
+    ## 1 0.02334382 0.02274882 0.13579408 2.017887e-26   TRUE             5
+    ## 2 0.03828485 0.03799225 0.06972208 4.837834e-58   TRUE             5
+    ## 3 0.04203845 0.04074831 0.10946784 2.858210e-47   TRUE             5
+    ## 4 0.05064581 0.04966111 0.16831656 8.994693e-64   TRUE             5
+    ## 5 0.00000000 0.00000000 0.01000000 1.000000e+00  FALSE             0
+    ## 6 0.06025320 0.05349119 0.34506197 7.611191e-40   TRUE             5
 
 -   HBD\_recap : a dataframe, which contains a mean of all the HBD
     inferences for an individual and a given marker.

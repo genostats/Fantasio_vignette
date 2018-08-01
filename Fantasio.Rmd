@@ -13,11 +13,15 @@ vignette: >
 ---
 ## Introduction
 
-Fantasio is composed of several functions. Its goals are for:
+Fantasio is composed of several functions. Its goals are:
 
-* Population genetic studies (estimating and detecting inbreeding on individuals without known genealogy, estimating the population proportion of mating types and the individual probability to be offspring of different mating types)
-* Rare disease studies (performing homozygosity mapping with heterogeneity)
-* Multifactorial disease studies (HBD-GWAS strategy).
+* For population genetic studies: estimating and detecting inbreeding on
+    individuals without known genealogy, estimating the population
+    proportion of mating types and the individual probability to be
+    offspring of different mating types
+* For rare disease studies: performing homozygosity mapping
+    with heterogeneity
+* For multifactorial disease studies: HBD-GWAS strategy
 
 Fantasio implements the creation of several random sparse submaps on genome-wide data (to remove linkage disequilibrium). It also provides graphical outputs to facilitate interpretations of homozygosity mapping results and plots.
 
@@ -31,7 +35,7 @@ Fantasio implements a maximum likelihood method that uses a hidden Markov chain 
 
 THe method requires the markers to be in minimal linkage disequilibrium (LD). Otherwise biased estimations of $f$ are produced. A strategy consisting of generating multiple random sparse genome maps (submaps) has been proposed to avoid this bias (Leutenegger et al. 2011). When several submaps are considered, $f$ is estimated as the median value on all the f estimation obtained on the different maps after removing submaps with $a > 1$ (having an average HBD segment length of 1 cM is unlikely to be detected with a SNP density of 1 per 0.5 cM). This strategy has the advantage of not requiring any LD computation on the sample and of minimizing loss of information, as compared with a strategy that based on a single map of markers in minimal LD.
 
-Fantasio also computes the likelihood of a mating type. These likelihoods can be used for:
+Fantasio statistical framework allows fixing HMM parameters to compute the likelihood of a mating type. These likelihoods can be used for:
 
 * Inferring an individual as inbred by comparing the maximized likelihood with the one to be outbred with a likelihood ratio test
 * Estimating the population proportion of mating types
@@ -50,7 +54,7 @@ $$FLOD^{(i)}(m,s) = log_{10}\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_
 With the following parameters : 
 
 * $Y_{m,s}^{(i)}$ the observed genotype of individual _i_ at marker _m_ on submap _s_
-* $H_{1}$ the hypothesis where $Y_{m,s}^{(i)}$ is linked to the disease, and $H_{0}$ the one where it is not
+* $H_{1}$ the hypothesis where marker $m$ is linked to the disease, and $H_{0}$ the one where it is not
 * $X_{m,s}^{(i)}$ the HBD status of individual _i_ at marker _m_ on submap _s_ that is estimated together with
 the inbreeding coefficient using the HMM of the package
 * $\hat{f}_s^{(i)}$ the estimated inbreeding coefficient of individual _i_ on submap _s_
@@ -71,7 +75,7 @@ The first thing you should know is that the package Fantasio depends on package 
 
 Please refer to the vignette of this package for more information.
 
-Since we explained the concept behind the package let's make an usage example of it. For this we will use the data furnish by the package HGDP. 
+Since we explained the concept behind the package let's make a usage example of it. For this we will use the data provided in the package HGDP-CEPH.
 
 ###1.1 Installation
 
@@ -87,6 +91,8 @@ After doing that we will need to run the following commands :
 require(Fantasio) 
 ```
 
+### 1.2 Input HGDP-CEPH data file
+
 ```{r eval=FALSE}
 install.packages("HGDP.CEPH", repos="https://genostats.github.io/R/") 
 ```
@@ -95,15 +101,15 @@ install.packages("HGDP.CEPH", repos="https://genostats.github.io/R/")
 require(HGDP.CEPH)
 ```
 
-###1.2 Input data file
-From now on, we can use the package. Let us first create our bed.matrix object using the data file we load with the package HGDP.CEPH.
+From now on, we can use the package. 
 
 ```{r}
 filepath <-system.file("extdata", "hgdp_ceph.bed", package="HGDP.CEPH")
 ```
 
 ###1.3 Creation of the bed matrix
-First create your bed.matrix object with this command :
+
+Let us first create a bed.matrix object (see gaston package for details) for the data file we loaded from the package HGDP.CEPH with this command :
 
 ```{r}
 x <- read.bed.matrix(filepath)
@@ -134,42 +140,62 @@ str(x.me)
 
 This object contains two slots : 
 
-* ped  : which gives you informations about all the individuals in the chip 
-* snps : which gives you informations about the snps itself
+* ped : which gives you information about all the individuals in the data
+* snps : which gives you information about the snps themselves
 
 More information in the vignette of the gaston package.
 
-##2. Wrapper
+##2. Running Fantasio
 
 We created a wrapper to make the usage of the package more simple.
 
-The following function calls two different functions : `createSegmentsListBySnps`  and `createSegmentsListBySnps`. The first function `createSegmentsListBySnps` is used to create a list of segments though the genome. The second function `makeAllSubmapsBySnps` or `makeAllSubsmapsbyHotspots` is used to create submaps.
-
-The `segments` arguments accept only two options : Hotspots or Distance which correspond to the method implemented in the package.
-
-We implemented in the package Fantasio two differents methods in order to create the submaps : 
+We implemented in the package two differents methods in order
+to create n submaps :
 
 * By "Hotspots" : 
-    *With this method we use a hotspots files to segment our genome, each segment contains several markers.
-     Once this step is done we then loop over the segments and pick one marker randomly. By   
-     doing this process we obtain a submap (a list of marker).
-  
-* By "Distance" : 
-    *With this method we use the gaps between markers to segment our data, each segment contains several     
-     markers. We then create mini-segments for each marker (by default we create 20 segments, each containing at 
-     least 50 markers, if the creation of 20 segments  in each we have 50 markers is impossible we do not create mini-segments).
-     After this process is done, we loop over the mini-segments, pick a random marker and go through the mini-segments by picking the nearest      marker after taking a step (default is 0,5 cM) downstream and upstream the mini-segments. 
+    with this method we use a file of recombination hotspots
+    (downloaded from the HapMap website in hg17 (\*)) to segment the genome. Segments should 
+    contain at least number_of_marker markers. Markers are then randomly selected 
+    within each segment along the genome. By doing this process we obtain a submap (a list of marker).
+    The recombination hotspots have been converted to other buid (hg18, hg19) using hgLiftOver. 
+    The default recombination hotspots file used is in hg19.
+    (\*) http://hapmap.ncbi.nlm.nih.gov/downloads/recombination/2006-10_rel21_phaseI+II/hotspots
 
-###2.1 By Hotspots
+* By "Distance" : 
+    with this method we use a fix step based on genetic or physiscal distance (0.5 cM by default) 
+    to pick a marker randomly along the genome.
+    More technically, segments are created whenever there is a gap larger 
+    than the step (0.5 cM) between adjacent markers. Each segment is then subdivided
+    in several mini-segments. By default we create 20 mini-segments, 
+    each containing at least 50 markers. If this is not possible 
+    (not enough markers), we do not create mini-segments. 
+    After this process is done, we loop over the mini-segments, pick a 
+    random marker and walk through the mini-segments by picking the nearest 
+    marker after taking a step (default 0.5 cM) downstream and upstream the mini-segments.
+
+The wrapper calls two different functions :
+`createSegmentsListBySnps` and `createSegmentsListBySnps`. The first
+function `createSegmentsListBySnps` is used to create a list of segments
+though the genome. The second function `makeAllSubmapsBySnps` or
+`makeAllSubsmapsbyHotspots` is used to create the submaps.
+
+###2.1 By Hotspots (Default)
+
+By default, the submaps are created using the file of recombination hotspots and summarizing the results for each snp.
 
 ```{r eval=FALSE}
-submaps2 <- Fantasio(bedmatrix=x.me, segments="Hotspot", n=5, verbose=FALSE, list.id = "all") 
+submaps2 <- Fantasio(bedmatrix=x.me, segments="Hotspots", n=5, verbose=FALSE, list.id = "all") 
 ```
+We require that at least n.consecutive.marker markers are HBD before calling a HBD segment. Default value for n.consecutive.marker=5.
+
+Here we need to use argument list.id = "all" because we do not have phenotype information for the HGDP-CEPH individuals. By default, Fantasio focuses on affected individuals only (status = 2). 
 
 ###2.2 By Hotspots by Segments
 
+For the hotspots option, results can be summarized globally for each segment (recap.by.segments=TRUE). For this reason, n.consecutive.marker should be set to 1. 
+
 ```{r eval=FALSE}
-submaps3 <- Fantasio(bedmatrix=x, segments="Hotspots", n=100, n.cores=20, recap.by.segments=TRUE, n.consecutive.marker=1, list.id = "all")
+submaps3 <- Fantasio(bedmatrix=x.me, segments="Hotspots", n=5, recap.by.segments=TRUE, verbose=FALSE, n.consecutive.marker=1, list.id = "all")
 ```
 
 ###2.3 By Distance
@@ -180,13 +206,14 @@ submaps4 <- Fantasio(bedmatrix=x.me, segments="Distance", n=5, verbose=FALSE, li
 
 ###2.4 How to use the segment.option argument
 
-In order to use the `segment.option` argument you need to pass a list of arguments, each variable names in the list must be an argument name in the function. The function that will be called is either `createsSegmentsListBySnps` if `segments` argument is equal to "Distance" or `createSegmentsListByHotspots`if `segments` argument is equal to "Hotspots"  and the arguments list will be pass to it.
+In order to use the `segment.option` argument you need to pass a list of arguments, each variable names in the list must be an argument name in the function. The function that will be called is either `createsSegmentsListBySnps` if `segments` argument is equal to "Distance" or `createSegmentsListByHotspots` if `segments` argument is equal to "Hotspots"  and the arguments list will be passed to it.
 
 ```{r eval=FALSE}
 l <- list(number_of_marker=50) #default is 0
 submaps5 <- Fantasio(bedmatrix=x, segments="Hotspots", segment.options=l, n=5, recap.by.segments=TRUE, list.id = "all")
 ```
-
+In the case of "Hotspots", by default, we do not require to have a minimum number of markers in each hotspots segments (number_of_marker = 0). 
+With the above command line, we impose to have at least 50 markers in each segment.
 
 ##3. Step by step usage of the package Fantasio
 
