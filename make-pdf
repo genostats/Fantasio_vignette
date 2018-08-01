@@ -1,0 +1,3 @@
+#!/bin/bash
+
+Rscript -e "rmarkdown::render(\"Fantasio.Rmd\", rmarkdown::pdf_document(toc=TRUE))"

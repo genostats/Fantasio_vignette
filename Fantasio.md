@@ -12,6 +12,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+author: Isuru HAUPE & Marie MICHEL
+date: 2018-08-01
+meta-json: {"date":"2018-08-01","output":"rmarkdown::html\\_vignette","version":"0.1","author":"Isuru HAUPE & Marie MICHEL","title":"Fantasio","vignette":"%\\VignetteIndexEntry{Vignette Title} %\\VignetteDepends{Fantasio}\n%\\VignettePackage{Fantasio} %\\VignetteEngine{knitr::rmarkdown}\n%\\VignetteEncoding{UTF-8}"}
+output: rmarkdown::html\_vignette
+title: Fantasio
+version: 0.1
+vignette: %\VignetteIndexEntry{Vignette Title} %\VignetteDepends{Fantasio}
+  %\VignettePackage{Fantasio} %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
 -   [Introduction](#introduction)
     -   [Principal concepts](#principal-concepts)
 -   [1. Getting started](#getting-started)
@@ -73,20 +83,20 @@ homozygous by descent (HBD) status. The emission probabilities of this
 hidden Markov model (HMM) depend on the allele frequencies. The
 transition probabilities depend on the genetic distance between two
 adjacent markers. This model allows estimating the inbreeding
-coefficient *f* of an individual, and a parameter *a*, where *a**f* is
-the instantaneous rate of change per unit map length (here cM) from no
-HBD to HBD. Both HBD and non-HBD segment lengths are assumed to be
-distributed exponentially with mean lengths $\\frac{1}{a(1-f)}$ and
-$\\frac{1}{af}$, respectively.
+coefficient \\(f\\) of an individual, and a parameter \\(a\\), where
+\\(af\\) is the instantaneous rate of change per unit map length (here
+cM) from no HBD to HBD. Both HBD and non-HBD segment lengths are assumed
+to be distributed exponentially with mean lengths \\(\frac{1}{a(1-f)}\\)
+and \\(\frac{1}{af}\\), respectively.
 
 THe method requires the markers to be in minimal linkage disequilibrium
-(LD). Otherwise biased estimations of *f* are produced. A strategy
+(LD). Otherwise biased estimations of \\(f\\) are produced. A strategy
 consisting of generating multiple random sparse genome maps (submaps)
 has been proposed to avoid this bias (Leutenegger et al. 2011). When
-several submaps are considered, *f* is estimated as the median value on
-all the f estimation obtained on the different maps after removing
-submaps with *a* &gt; 1 (having an average HBD segment length of 1 cM is
-unlikely to be detected with a SNP density of 1 per 0.5 cM). This
+several submaps are considered, \\(f\\) is estimated as the median value
+on all the f estimation obtained on the different maps after removing
+submaps with \\(a > 1\\) (having an average HBD segment length of 1 cM
+is unlikely to be detected with a SNP density of 1 per 0.5 cM). This
 strategy has the advantage of not requiring any LD computation on the
 sample and of minimizing loss of information, as compared with a
 strategy that based on a single map of markers in minimal LD.
@@ -108,48 +118,49 @@ Homozygosity mapping (Lander and Botstein 1987) consists in focusing on
 inbred affected individuals and searching for a region of the genome of
 shared homozygosity. Original homozygosity mapping requires that the
 genealogy of patients be known so that inbred patients can be identified
-and their respective *f* estimated. Leutenegger et al. (Leutenegger et
-al. 2006) proposed using the *f* estimated on genome-wide genetic data
-to compute a FLOD score, similar to Mortons LOD score (Morton 1955).
+and their respective \\(f\\) estimated. Leutenegger et al. (Leutenegger
+et al. 2006) proposed using the \\(f\\) estimated on genome-wide genetic
+data to compute a FLOD score, similar to Mortons LOD score (Morton
+1955).
 
 Genin et al. (Genin et al. 2012) adapted the FLOD formula for multiple
-submaps. FLOD(i)(m,s) is computed for each individual *i*, each marker
-*m* on each submap *s*, using the equation:
+submaps. FLOD(i)(m,s) is computed for each individual \\(i\\), each
+marker \\(m\\) on each submap \\(s\\), using the equation:
 
-$$FLOD^{(i)}(m,s) = log\_{10}\\frac{P\\left(Y\_{m,s}^{(i)} | H\_{1}\\right)}{P\\left(Y\_{m,s}^{(i)} | H\_{0}\\right)} = log\_{10}\\frac{P\\left(X\_{m,s}^{(i)}=1 | Y\_{m,s}^{(i)}\\right) + q.P\\left(X\_{m,s}^{(i)}=0 | Y\_{m,s}^{(i)}\\right)}{\\hat{f}\_s^{(i)} + q.\\left(1-\\hat{f}\_s^{(i)}\\right)}$$
+\\[FLOD^{(i)}(m,s) = log_{10}\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_{m,s}^{(i)} | H_{0}\right)} = log_{10}\frac{P\left(X_{m,s}^{(i)}=1 | Y_{m,s}^{(i)}\right) + q.P\left(X_{m,s}^{(i)}=0 | Y_{m,s}^{(i)}\right)}{\hat{f}_s^{(i)} + q.\left(1-\hat{f}_s^{(i)}\right)}\\]
 
 With the following parameters :
 
--   *Y*<sub>*m*, *s*</sub><sup>(*i*)</sup> the observed genotype of
-    individual *i* at marker *m* on submap *s*
--   *H*<sub>1</sub> the hypothesis where
-    *Y*<sub>*m*, *s*</sub><sup>(*i*)</sup> is linked to the disease, and
-    *H*<sub>0</sub> the one where it is not
--   *X*<sub>*m*, *s*</sub><sup>(*i*)</sup> the HBD status of individual
-    *i* at marker *m* on submap *s* that is estimated together with the
-    inbreeding coefficient using the HMM of the package
--   $\\hat{f}\_s^{(i)}$ the estimated inbreeding coefficient of
+-   \\(Y_{m,s}^{(i)}\\) the observed genotype of individual *i* at
+    marker *m* on submap *s*
+-   \\(H_{1}\\) the hypothesis where \\(Y_{m,s}^{(i)}\\) is linked to
+    the disease, and \\(H_{0}\\) the one where it is not
+-   \\(X_{m,s}^{(i)}\\) the HBD status of individual *i* at marker *m*
+    on submap *s* that is estimated together with the inbreeding
+    coefficient using the HMM of the package
+-   \\(\hat{f}_s^{(i)}\\) the estimated inbreeding coefficient of
     individual *i* on submap *s*
 -   *q* the assumed frequency of the mutation involved in the disease
     for this individual.
 
 Results are then averaged over the different submaps to obtain a single
-*F**L**O**D*<sup>(*i*)</sup>(*m*) at each marker *m*.
+\\(FLOD^{(i)}(m)\\) at each marker *m*.
 
 Genin et al. (Genin et al. 2012) proposed to detect fully penetrant rare
 recessive variants by performing homozygosity mapping on inbred cases
 from Genome-Wide Association Study (GWAS) data. Linkage evidence is then
 evaluated over the entire set I of inbred cases by computing a FLOD
-score, HFLOD(m,*α*), at each marker m, with a heterogeneity parameter
-*α*, that takes into account the possibility that only a fraction of the
-inbred affected individuals carry diseases causing mutations:
+score, HFLOD(m,\\(\alpha\\)), at each marker m, with a heterogeneity
+parameter \\(\alpha\\), that takes into account the possibility that
+only a fraction of the inbred affected individuals carry diseases
+causing mutations:
 
-$$HFLOD(m,\\alpha)=\\sum log\_{10} \\left\[\\alpha.\\frac{P\\left(Y\_{m,s}^{(i)} | H\_{1}\\right)}{P\\left(Y\_{m,s}^{(i)} | H\_{0}\\right)}+ (1 - \\alpha)\\right \]= \\sum log\_{10} \\left\[\\alpha . exp \\left(FLOD^{(i)}(m)\*log(10)\\right)+(1-\\alpha)\\right\] $$
- This heterogeneity score is then maximized over *α* to evaluate the
-evidence of linkage at marker *m* where *α* is the estimate of the
-proportion of cases linked to this locus:
+\\[HFLOD(m,\alpha)=\sum log_{10} \left[\alpha.\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_{m,s}^{(i)} | H_{0}\right)}+ (1 - \alpha)\right ]= \sum log_{10} \left[\alpha . exp \left(FLOD^{(i)}(m)*log(10)\right)+(1-\alpha)\right] \\]
+This heterogeneity score is then maximized over \\(\alpha\\) to evaluate
+the evidence of linkage at marker *m* where \\(\alpha\\) is the estimate
+of the proportion of cases linked to this locus:
 
-*H**F**L**O**D*(*m*)=*m**a**x*<sub>*α*</sub>(*H**F**L**O**D*(*m*, *α*))
+\\[HFLOD(m)=max_{\alpha}(HFLOD(m,\alpha))\\]
 
 1. Getting started
 ------------------
@@ -192,7 +203,7 @@ After doing that we will need to run the following commands :
     ## 
     ##     LdFlags
 
-    ## Gaston set number of threads to 8. Use setThreadOptions() to modify this.
+    ## Gaston set number of threads to 4. Use setThreadOptions() to modify this.
 
     ## 
     ## Attaching package: 'gaston'
@@ -224,8 +235,8 @@ First create your bed.matrix object with this command :
 
     x <- read.bed.matrix(filepath)
 
-    ## Reading /ext/home/haupe/R/x86_64-pc-linux-gnu-library/3.4/HGDP.CEPH/extdata/hgdp_ceph.rds 
-    ## Reading /ext/home/haupe/R/x86_64-pc-linux-gnu-library/3.4/HGDP.CEPH/extdata/hgdp_ceph.bed
+    ## Reading /home/rv/R/R-3.4/HGDP.CEPH/extdata/hgdp_ceph.rds 
+    ## Reading /home/rv/R/R-3.4/HGDP.CEPH/extdata/hgdp_ceph.bed
 
 This command returns an updated 'bed.matrix' object (refer to gaston
 vignette for more informations and function documentation) :
@@ -483,9 +494,9 @@ description of each structure in this object :
 -   a : a matrix with all the a's estimation
 -   f : a matrix with all the f's estimation
 -   likelihood0 : a matrix with all the likehood under the null
-    hypothesis (*f* = 0)
+    hypothesis (\\(f=0\\))
 -   likelihood1 : a matrix with all the likehood under the inbred
-    hypothesis (*f* = 1)
+    hypothesis (\\(f=1\\))
 -   p.lrt : p value of the likelihood ratio test
 -   HBD.prob : a matrix with all the HBD probabilities computed for each
     individual
@@ -541,20 +552,20 @@ description of each structure in this object :
 
     head(submaps@submap_summary)
 
-    ##         FID       IID STATUS SUBMAPS QUALITY      F_MIN      F_MAX
-    ## 1 HGDP00607 HGDP00607      1   5 / 5     100 0.01953151 0.02809333
-    ## 2 HGDP00608 HGDP00608      1   5 / 5     100 0.03781844 0.04907346
-    ## 3 HGDP00609 HGDP00609      1   5 / 5     100 0.03996605 0.04871983
-    ## 4 HGDP00610 HGDP00610      1   5 / 5     100 0.04814213 0.06403355
-    ## 5 HGDP00611 HGDP00611      1   1 / 5      20 0.00000000 0.00000000
-    ## 6 HGDP00612 HGDP00612      1   5 / 5     100 0.05046885 0.05781950
-    ##       F_MEAN   F_MEDIAN   A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
-    ## 1 0.02200639 0.02028013 0.11395995 1.148022e-25   TRUE             5
-    ## 2 0.04136345 0.03994302 0.06838627 2.366245e-59   TRUE             5
-    ## 3 0.04329683 0.04172175 0.12245826 2.981348e-49   TRUE             5
-    ## 4 0.05491828 0.05219244 0.15926157 4.420364e-63   TRUE             5
-    ## 5 0.00000000 0.00000000 0.01000000 1.000000e+00  FALSE             0
-    ## 6 0.05466913 0.05664110 0.31531895 3.767947e-38   TRUE             5
+    ##         FID       IID STATUS SUBMAPS QUALITY       F_MIN       F_MAX
+    ## 1 HGDP00607 HGDP00607      1   5 / 5     100 0.019871212 0.031541238
+    ## 2 HGDP00608 HGDP00608      1   5 / 5     100 0.036929595 0.041122815
+    ## 3 HGDP00609 HGDP00609      1   5 / 5     100 0.039033231 0.043588668
+    ## 4 HGDP00610 HGDP00610      1   5 / 5     100 0.047351750 0.057783542
+    ## 5 HGDP00611 HGDP00611      1   1 / 5      20 0.008597126 0.008597126
+    ## 6 HGDP00612 HGDP00612      1   5 / 5     100 0.055262272 0.064545913
+    ##        F_MEAN    F_MEDIAN   A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
+    ## 1 0.024969147 0.023725097 0.15197107 5.717995e-26   TRUE             5
+    ## 2 0.038305015 0.037526806 0.06729407 4.731140e-61   TRUE             5
+    ## 3 0.041414674 0.041457950 0.11258395 9.931170e-50   TRUE             5
+    ## 4 0.052951953 0.052768073 0.16159346 1.617061e-64   TRUE             5
+    ## 5 0.008597126 0.008597126 0.81693401 2.553957e-02   TRUE             1
+    ## 6 0.060982058 0.062759170 0.34121097 1.140623e-39   TRUE             5
 
 -   HBD\_recap : a dataframe, which contains a mean of all the HBD
     inferences for an individual and a given marker.
@@ -694,19 +705,19 @@ functions :
 
     HBD.plot.chr(submaps, chr=20)
 
-![](Fantasio_files/figure-markdown_strict/fig1-1.png)
+![](Fantasio_files/figure-markdown_mmd/fig1-1.png)
 
 ### 5.2 HBD plot for an individual
 
     HBD.plot.id(submaps, individual.id = "HGDP00649", family.id = "HGDP00649")
 
-![](Fantasio_files/figure-markdown_strict/fig2-1.png)
+![](Fantasio_files/figure-markdown_mmd/fig2-1.png)
 
 ### 5.3 HFLOD manhattan plot
 
     HFLOD.manhattan.plot(submaps)
 
-![](Fantasio_files/figure-markdown_strict/fig3-1.png)
+![](Fantasio_files/figure-markdown_mmd/fig3-1.png)
 
 -   The red lines that you see is the value of alpha for the markers.
 
@@ -714,7 +725,7 @@ functions :
 
     HFLOD.plot.chr(submaps, chr=20)
 
-![](Fantasio_files/figure-markdown_strict/fig4-1.png)
+![](Fantasio_files/figure-markdown_mmd/fig4-1.png)
 
 -   As you can see you have a red line plotted, it gives the moving
     average of the HFLOD, calculated on moving windows of 50 markers
