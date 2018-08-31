@@ -12,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 ## Introduction
 
 Fantasio is composed of several functions. Its goals are:
@@ -458,7 +459,8 @@ F6 <- Fantasio(bedmatrix=x.me, segments="Hotspots", n=5, verbose=FALSE, n.cores=
 ```{r fig3, fig.height = 5, fig.width = 10}
 HFLOD.manhattan.plot(F1)
 ```
-The red lines that you see is the value of alpha for the markers.
+
+* The red lines that you see is the value of the moving average (more information below).
 
 ###5.2 HFLOD for a chromosome
 ```{r fig4, fig.height = 5, fig.width = 8}
