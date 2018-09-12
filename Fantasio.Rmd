@@ -227,7 +227,7 @@ For the sake of clarity we have only created 5 submaps, but generally we do 100.
 
 This function will creates 5 submaps, all the parameters can be modified (use args(makeAllSubmapsByHotspots) for more informations).
 
-The variable submaps becomes an list.submaps object, you can watch the different elements of it with : 
+The variable submaps becomes an submapsList object, you can watch the different elements of it with : 
 
 ```{r eval=FALSE}
 str(F1) #careful it can become huge depending on your data sizes
@@ -244,7 +244,7 @@ Here is a complete description of each structure in this object :
 str(F1@segments_list) #careful it can become huge depending on your data sizes
 ```
 
-* atlas : the list of all the submaps created during the process. Each element of the list is a S4 object. Depending on the method you used the object can be either a `snsp.matrix` or a `hotspots.matrix` (here we use the hotspots method). Each submaps contains 15 slots : 
+* atlas : the list of all the submaps created during the process. Each element of the list is a S4 object. Depending on the method you used the object can be either a `snsp.matrix` or a `HostspotsMatrix` (here we use the hotspots method). Each submaps contains 15 slots : 
     * submap : the index of each marker picked (index from the bed.matrix object)
     * ncol : the total number of marker picked 
     * nrow : the number of individuals 
@@ -320,10 +320,10 @@ F1@FLOD_recap[1:10, 1:10] # an individual * marker matrix
 ```
 
 
-* HBD_segments : a list of dataframe, each datafram is for an individual and it contains a list of HBD segments (start and end positions). By default, a region is HBD if it contains at least 5 markers (n.consecutive.marker=5) with a HBD probability larger than 0.5 (threshold=0.5).
+* HBDsegments : a list of dataframe, each datafram is for an individual and it contains a list of HBDsegments (start and end positions). By default, a region is HBD if it contains at least 5 markers (n.consecutive.marker=5) with a HBD probability larger than 0.5 (threshold=0.5).
 
 ```{r eval=FALSE}
-str(F1@HBD_segments[[1]])
+str(F1@HBDsegments[[1]])
 ```
 
 * HFLOD : a dataframe with the value of HFLOD scores for every markers that appeared at least once in a submap. It uses the formula (2) with FLOD_recap to obtain HFLOD.
@@ -381,7 +381,7 @@ This function creates segments based on the markers available in the data and th
   
 * gap           : the value of the minimal fix step required between sampled markers of a submap
 * unit          : the unit of the markers ("cM" or "Bp")
-* snps.segments : for each chromosome, the list of segments; each segment being a list of SNP indexes
+* snpsSegments : for each chromosome, the list of segments; each segment being a list of SNP indexes
 
 You can watch a summary of what was done with : 
   
@@ -404,7 +404,7 @@ We will now head toward the creation of submaps using the following commands :
 F3 <- makeAllSubmapsBySnps(x.be, 5, s3, verbose=FALSE, list.id = "all")
 ```
 
-The variable submaps becomes an list.submaps object, you can watch the different elements of it with : 
+The variable submaps becomes an submapsList object, you can watch the different elements of it with : 
 
 ```{r eval=FALSE}
 str(F3) #careful it can become huge depending on your data sizes
@@ -427,16 +427,16 @@ F6 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=5, verbose=FALSE, n.cores=
 
 ##5. Plotting 
 
-###5.1 HFLOD manhattan plot
+###5.1 HFLODManhattanPlot
 ```{r fig3, fig.height = 5, fig.width = 10}
-HFLOD.manhattan.plot(F1)
+HFLODManhattanPlot(F1)
 ```
 
 * The red lines that you see is the value of the moving average (more information below).
 
 ###5.2 HFLOD for a chromosome
 ```{r fig4, fig.height = 5, fig.width = 8}
-HFLOD.plot.chr(F1, chr=15)
+HFLODplotChr(F1, chr=15)
 ```
 
 * As you can see you have a red line plotted, it is the moving average of the HFLOD, calculated
@@ -448,12 +448,12 @@ HFLOD.plot.chr(F1, chr=15)
 
 ###5.3 HBD plot for a chromosome 
 ```{r fig1, fig.height = 5, fig.width = 8}
-HBD.plot.chr(F1, chr=15)
+HBDplotChr(F1, chr=15)
 ```
 
 ###5.4 HBD plot for an individual
 ```{r fig2, fig.height = 5, fig.width = 8}
-HBD.plot.id(F1, individual.id = "HGDP00649", family.id = "HGDP00649")
+HBDplotId(F1, individual.id = "HGDP00649", family.id = "HGDP00649")
 ```
 
 
