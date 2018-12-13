@@ -77,7 +77,7 @@ The package `Fantasio` depends on `gaston`. Hereafter the functions of this pack
 are used for data manipulation. If you are not familiar with `gaston`, please 
 refer to the vignette of this package for more information.
 
-###1.1 Installation
+###1.1 Installing Fantasio
 
 First and foremost install the package with the following command:
 
@@ -91,7 +91,7 @@ After that we can load the package.
 require(Fantasio) 
 ```
 
-### 1.2 Example data: HGDP-CEPH 
+### 1.2 Installing example data: HGDP-CEPH 
 
 We illustrate the usage of the package with the data provided in the data package HGDP-CEPH.
 First, we need to install it:
@@ -103,13 +103,14 @@ install.packages("HGDP.CEPH", repos="https://genostats.github.io/R/")
 We can load the HGDP-CEPH data as follows:
 ```{r}
 require(HGDP.CEPH)
-filepath <-system.file("extdata", "hgdp_ceph.bed", package="HGDP.CEPH")
+filepath <- system.file("extdata", "hgdp_ceph.bed", package="HGDP.CEPH")
 x <- read.bed.matrix(filepath)
 ```
 
-The object`x` is a bed.matrix object (see gaston package for details).
+The object `x` is a bed.matrix object (see gaston package for details).
 
-We are going to work on the Bedouin population, so after updating the stats in `x`, we select this population:
+We are going to work on the Bedouin population, so after updating the stats in `x` (this adds several informations
+such as allele frequencies, etc), we select this population:
 
 ```{r}
 x <- set.stats(x)
@@ -120,7 +121,7 @@ x.be <- select.inds(x, population == "Bedouin")
 
 Two differents methods for submaps creation are implemented in the package:
 
-* By "Hotspots" : 
+* "By Hotspots": 
     with this method we use recombination hotspots to segment the genome. The package
     contains recombination hotspots for the Human Genome in builds 35 (hg17), 36 (hg18)
     and 37 (hg19) in datasets `hotspots_hg17`, `hotspots_hg18`,`hotspots_hg19`.
@@ -129,7 +130,7 @@ Two differents methods for submaps creation are implemented in the package:
     contain at least a user defined number of markers. Markers are then randomly selected 
     within each segment along the genome. By doing this process we obtain a submap (a list of marker).
 
-* By "Distance" : 
+* "By Distance" or "by SNPs": 
     with this method we use a fixed step based on genetic or physiscal distance (0.5 cM by default) 
     to pick a marker randomly along the genome.
     More technically, segments are created whenever there is a gap larger 
@@ -141,10 +142,10 @@ Two differents methods for submaps creation are implemented in the package:
     random marker and walk through the mini-segments by picking the nearest 
     marker after taking a step (default 0.5 cM) downstream and upstream the mini-segments.
 
-The wrapper calls two different functions :
-`createSegmentsListBySnps` and `createSegmentsListBySnps`. The first
-function `createSegmentsListBySnps` is used to create a list of segments
-though the genome. The second function `makeAllSubmapsBySnps` or
+The function `Fantasio` calls two different functions for submaps creation,
+based on the value of `segments`: `segmentsListByHotspots` and `segmentsListByDistance`. 
+The first function `segmentsListByDistance` is used to create a list of segments
+though the genome. The second function `makeAtlasByDistance` or
 `makeAllSubsmapsbyHotspots` is used to create the submaps.
 
 ###2.1 Hotspots (Default)
@@ -180,13 +181,13 @@ F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n=5, list.id = "all")
 
 ###2.4 How to use the segment.option argument
 
-In order to use the `segment.option` argument you need to pass a list of arguments, each variable name in the list must be an argument name in the function. The function that will be called is either `createsSegmentsListBySnps` if `segments` argument is equal to "Distance" or `createSegmentsListByHotspots` if `segments` argument is equal to "Hotspots"  and the arguments list will be passed to it. So refer to these functions for possible arguments.
+In order to use the `segment.option` argument you need to pass a list of arguments, each variable name in the list must be an argument name in the function. The function that will be called is either `createsSegmentsListByDistance` if `segments` argument is equal to "Distance" or `segmentsListByHotspots` if `segments` argument is equal to "Hotspots"  and the arguments list will be passed to it. So refer to these functions for possible arguments.
 
 ```{r eval=FALSE}
-l <- list(number_of_marker=50) #default is 0
+l <- list(minMarkers=50) #default is 0
 F1.l <- Fantasio(bedmatrix=x, segments="Hotspots", segment.options=l, list.id = "all")
 ```
-In the case of "Hotspots", by default, we do not require to have a minimum number of markers in each segment (number_of_marker = 0). 
+In the case of "Hotspots", by default, we do not require to have a minimum number of markers in each segment (`minMarkers = 0`). 
 With the above command line, we impose to have at least 50 markers in a segment. Otherwise it is merged with the previous segment.
 
 ##3. Step by step usage of the package Fantasio
@@ -198,7 +199,7 @@ With the above command line, we impose to have at least 50 markers in a segment.
 We will now create segments, which will be use to create the submaps later, further explication below, for now use this command :
  
 ```{r}
-s1 <- createSegmentsListByHotspots(x.be)
+s1 <- segmentsListByHotspots(x.be)
 ```
 
 This function creates a list of chromosomes, in each, you have a list of several segments created thanks to the hotspots file given in argument (files are given with the package), in each segments you have SNPs index.
@@ -220,12 +221,14 @@ This function creates a dataframe with three colums :
 We will now head toward the creation of submaps using the following commands : 
 
 ```{r}
-F1 <- makeAllSubmapsByHotspots(x.be, 5, s1, verbose=FALSE, list.id = "all") 
+F1 <- makeAtlasByHotspots(x.be, 5, s1)
+F1 <- festim(F1)
+F1 <- setSummary(F1, list.id = "all")
 ```
 
 For the sake of clarity we have only created 5 submaps, but generally we do 100.
 
-This function will creates 5 submaps, all the parameters can be modified (use args(makeAllSubmapsByHotspots) for more informations).
+This function will creates 5 submaps, all the parameters can be modified (use args(makeAtlasByHotspots) for more informations).
 
 The variable submaps becomes an submapsList object, you can watch the different elements of it with : 
 
@@ -244,7 +247,7 @@ Here is a complete description of each structure in this object :
 str(F1@segments_list) #careful it can become huge depending on your data sizes
 ```
 
-* atlas : the list of all the submaps created during the process. Each element of the list is a S4 object. Depending on the method you used the object can be either a `snsp.matrix` or a `HostspotsMatrix` (here we use the hotspots method). Each submaps contains 15 slots : 
+* submaps_list : the list of all the submaps created during the process. Each element of the list is a S4 object. Depending on the method you used the object can be either a `snsp.matrix` or a `HostspotsMatrix` (here we use the hotspots method). Each submaps contains 15 slots : 
     * submap : the index of each marker picked (index from the bed.matrix object)
     * ncol : the total number of marker picked 
     * nrow : the number of individuals 
@@ -262,7 +265,7 @@ str(F1@segments_list) #careful it can become huge depending on your data sizes
     * FLOD : a matrix with all the FLOD score computed 
 
 ```{r eval=FALSE}
-str(F1@atlas)
+str(F1@submaps_list)
 ```
 
 * likelihood_summary : a dataframe with all the likelihood0 and likelihood1 computed over the submaps.
@@ -363,7 +366,9 @@ As said before the only argument that changes is "recap.by.segments", it is put 
 And we recommend to adjust "n.consecutive.marker".
 
 ```{r}
-F2 <- makeAllSubmapsByHotspots(x.be, 5, s1, verbose=FALSE, recap.by.segments = TRUE, n.consecutive.marker=1, list.id = "all")
+F2 <- makeAtlasByHotspots(x.be, 5, s1)
+F2 <- festim(F2)
+F2 <- setSummary(F2, recap.by.segments = TRUE, n.consecutive.marker = 1, list.id = "all")
 ```
 
 
@@ -374,7 +379,7 @@ F2 <- makeAllSubmapsByHotspots(x.be, 5, s1, verbose=FALSE, recap.by.segments = T
 We will now create segments, which will be used to create the submaps later :
   
 ```{r}
-s3 <- createSegmentsListBySnps(x.be)
+s3 <- segmentsListByDistance(x.be)
 ```
 
 This function creates segments based on the markers available in the data and the gaps between them. The value of the gap is imposed by the minimun step required between markers. If 2 adjacent markers have an inter-distance larger than the step, then there is a gap between them. The first marker of the pair is the end of a segment and the second marker is the start of a new segment. The function creates an object which will contain three slots :
@@ -401,7 +406,9 @@ This function creates a dataframe with three colums :
 We will now head toward the creation of submaps using the following commands : 
   
 ```{r}
-F3 <- makeAllSubmapsBySnps(x.be, 5, s3, verbose=FALSE, list.id = "all")
+F3 <- makeAtlasByDistance(x.be, 5, s3)
+F3 <- festim(F3)
+F3 <- setSummary(F3, list.id = "all")
 ```
 
 The variable submaps becomes an submapsList object, you can watch the different elements of it with : 
@@ -418,8 +425,8 @@ We implemented a paralellism method to make the creation of the submaps more eff
 Use the `n.cores` argument, i.e the number of CPU that will be used to make the differents submaps in the following functions : 
   
 * Fantasio
-* makeAllSubmapsByHotspots
-* makeAllSubmapsBySnps
+* makeAtlasByHotspots
+* makeAtlasByDistance
 
 ```{r eval=FALSE}
 F6 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=5, verbose=FALSE, n.cores=10, list.id = "all")
