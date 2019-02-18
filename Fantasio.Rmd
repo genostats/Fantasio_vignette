@@ -184,7 +184,7 @@ though the genome. The second function `makeAtlasByDistance` or
 By default, the submaps are created using the file of recombination hotspots and summarizing the results for each snp that appears in a submap.
 
 ```{r}
-F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=100, verbose = FALSE) 
+F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=5, verbose = FALSE) 
 ```
 
 Among the slots containg results of interest, we show here `F1@submap_summary` which contains
@@ -218,7 +218,7 @@ For the "Hotspots" method, the results can also be summarized globally for each 
 
 ```{r}
 F2 <- Fantasio(bedmatrix=x.be, segments="Hotspots", recap.by.segments=TRUE, 
-  n.consecutive.marker=1, n=100, verbose=FALSE)
+  n.consecutive.marker=1, n=5, verbose=FALSE)
 ```
 
 ## Distance
@@ -259,7 +259,7 @@ and `recap.by.segments=TRUE`.
 This plot shows the values of the HFLOD linkage statistics along the genome
 (contained in `F1@HFLOD`).
 
-```{r fig3, fig.height = 5, fig.width = 10}
+```{r fig3, fig.height = 5, fig.width = 10, dev = 'png'}
 HFLODManhattanPlot(F1)
 ```
 
@@ -269,7 +269,7 @@ The red line is the value of their moving average (see below).
 
 To plot a single chromosome, use the following function:
 
-```{r fig4, fig.height = 5, fig.width = 8}
+```{r fig4, fig.height = 5, fig.width = 8, dev = 'png'}
 HFLODplotChr(F1, chr=15)
 ```
 

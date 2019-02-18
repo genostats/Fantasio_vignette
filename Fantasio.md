@@ -24,30 +24,41 @@ vignette: % % % % %
 
 -   [Introduction](#introduction)
     -   [Principal concepts](#principal-concepts)
--   [1. Getting started](#getting-started)
-    -   [1.1 Installing Fantasio](#installing-fantasio)
-    -   [1.2 Installing example data:
+-   [Getting started](#getting-started)
+    -   [Installing Fantasio](#installing-fantasio)
+    -   [Installing example data:
         HGDP-CEPH](#installing-example-data-hgdp-ceph)
--   [2. Running Fantasio](#running-fantasio)
-    -   [2.1 Hotspots (Default)](#hotspots-default)
-    -   [2.2 Hotspots by Segments](#hotspots-by-segments)
-    -   [2.3 Distance](#distance)
-    -   [2.4 How to use the segment.option
+-   [Running Fantasio](#running-fantasio)
+    -   [Hotspots (Default)](#hotspots-default)
+    -   [Hotspots by Segments](#hotspots-by-segments)
+    -   [Distance](#distance)
+    -   [How to use the segment.option
         argument](#how-to-use-the-segment.option-argument)
--   [5. Plotting](#plotting)
-    -   [5.1 HFLODManhattanPlot](#hflodmanhattanplot)
-    -   [5.2 HFLOD for a chromosome](#hflod-for-a-chromosome)
-    -   [5.3 HBD plot for a chromosome](#hbd-plot-for-a-chromosome)
-    -   [5.4 HBD plot for an individual](#hbd-plot-for-an-individual)
--   [3. Step by step usage of the package
+-   [Plotting results](#plotting-results)
+    -   [HFLOD plots](#hflod-plots)
+    -   [HBD plots](#hbd-plots)
+-   [Step by step usage of the package
     Fantasio](#step-by-step-usage-of-the-package-fantasio)
-    -   [3.1 Hotspots](#hotspots)
-    -   [3.2 Hotspots by segments](#hotspots-by-segments-1)
-    -   [3.3 Distance](#distance-1)
--   [4. Parallelism with the package](#parallelism-with-the-package)
+    -   [Hotspots](#hotspots)
+        -   [Creation of the segments
+            list](#creation-of-the-segments-list)
+        -   [Creation of the submaps and
+            computation](#creation-of-the-submaps-and-computation)
+        -   [Descrition of the object F1](#descrition-of-the-object-f1)
+    -   [Hotspots by segments](#hotspots-by-segments-1)
+        -   [Creation of the segments
+            list](#creation-of-the-segments-list-1)
+        -   [Creation of the submaps and
+            computation](#creation-of-the-submaps-and-computation-1)
+    -   [Distance](#distance-1)
+        -   [Creation of the segments
+            list](#creation-of-the-segments-list-2)
+        -   [Creation of the submaps and
+            computation](#creation-of-the-submaps-and-computation-2)
+-   [Parallelism with the package](#parallelism-with-the-package)
 
 Introduction
-------------
+============
 
 Fantasio is composed of several functions. Its goals are:
 
@@ -73,7 +84,8 @@ Not all options of the functions are described here, but rather their
 basic usage. The reader is advised to look at the manual page of the
 function for details.
 
-### Principal concepts
+Principal concepts
+------------------
 
 Fantasio implements a maximum likelihood method that uses a hidden
 Markov chain to model the dependencies along the genome between the
@@ -88,7 +100,7 @@ cM) from no HBD to HBD. Both HBD and non-HBD segment lengths are assumed
 to be distributed exponentially with mean lengths \\(\frac{1}{a(1-f)}\\)
 and \\(\frac{1}{af}\\), respectively.
 
-THe method requires the markers to be in minimal linkage disequilibrium
+The method requires the markers to be in minimal linkage disequilibrium
 (LD). Otherwise biased estimations of \\(f\\) are produced. A strategy
 consisting of generating multiple random sparse genome maps (submaps)
 has been proposed to avoid this bias (Leutenegger et al. 2011). When
@@ -153,21 +165,23 @@ score, HFLOD(m,\\(\alpha\\)), at each marker *m*, in presence of genetic
 heterogeneity using a parameter \\(\alpha\\) (2):
 
 \\[HFLOD(m,\alpha)=\sum log_{10} \left[\alpha.\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_{m,s}^{(i)} | H_{0}\right)}+ (1 - \alpha)\right ]= \sum log_{10} \left[\alpha . exp \left(FLOD^{(i)}(m)*log(10)\right)+(1-\alpha)\right] \\]
+
 This heterogeneity score is then maximized over \\(\alpha\\) to evaluate
 the evidence of linkage at marker *m* where \\(\alpha\\) is the estimate
 of the proportion of cases linked to this locus (3):
 
 \\[HFLOD(m)=max_{\alpha}(HFLOD(m,\alpha))\\]
 
-1. Getting started
-------------------
+Getting started
+===============
 
 The package `Fantasio` depends on `gaston`. Hereafter the functions of
 this package are used for data manipulation. If you are not familiar
 with `gaston`, please refer to the vignette of this package for more
 information.
 
-### 1.1 Installing Fantasio
+Installing Fantasio
+-------------------
 
 First and foremost install the package with the following command:
 
@@ -207,7 +221,8 @@ After that we can load the package.
     ## 
     ##     cbind, rbind
 
-### 1.2 Installing example data: HGDP-CEPH
+Installing example data: HGDP-CEPH
+----------------------------------
 
 We illustrate the usage of the package with the data provided in the
 data package HGDP-CEPH. First, we need to install it:
@@ -240,8 +255,8 @@ etc), we select this population:
 
     x.be <- select.inds(x, population == "Bedouin")
 
-2. Running Fantasio
--------------------
+Running Fantasio
+================
 
 Two differents methods for submaps creation are implemented in the
 package:
@@ -274,289 +289,88 @@ used to create a list of segments though the genome. The second function
 `makeAtlasByDistance` or `makeAllSubsmapsbyHotspots` is used to create
 the submaps.
 
-### 2.1 Hotspots (Default)
+Hotspots (Default)
+------------------
 
 By default, the submaps are created using the file of recombination
 hotspots and summarizing the results for each snp that appears in a
 submap.
 
-    F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=5) 
-
-    ## Using hotspots from  hotspot_hg19 
-    ## Gathering all hotspots for the genome : ......................
-    ## Gathering all the genome's markers : ......................
-    ## Finding which markers are between two hotspots : ......................
-    ## Estimation f and a for individual # 1 
-    ## Estimation f and a for individual # 2 
-    ## Estimation f and a for individual # 3 
-    ## Estimation f and a for individual # 4 
-    ## Estimation f and a for individual # 5 
-    ## Estimation f and a for individual # 6 
-    ## Estimation f and a for individual # 7 
-    ## Estimation f and a for individual # 8 
-    ## Estimation f and a for individual # 9 
-    ## Estimation f and a for individual # 10 
-    ## Estimation f and a for individual # 11 
-    ## Estimation f and a for individual # 12 
-    ## Estimation f and a for individual # 13 
-    ## Estimation f and a for individual # 14 
-    ## Estimation f and a for individual # 15 
-    ## Estimation f and a for individual # 16 
-    ## Estimation f and a for individual # 17 
-    ## Estimation f and a for individual # 18 
-    ## Estimation f and a for individual # 19 
-    ## Estimation f and a for individual # 20 
-    ## Estimation f and a for individual # 21 
-    ## Estimation f and a for individual # 22 
-    ## Estimation f and a for individual # 23 
-    ## Estimation f and a for individual # 24 
-    ## Estimation f and a for individual # 25 
-    ## Estimation f and a for individual # 26 
-    ## Estimation f and a for individual # 27 
-    ## Estimation f and a for individual # 28 
-    ## Estimation f and a for individual # 29 
-    ## Estimation f and a for individual # 30 
-    ## Estimation f and a for individual # 31 
-    ## Estimation f and a for individual # 32 
-    ## Estimation f and a for individual # 33 
-    ## Estimation f and a for individual # 34 
-    ## Estimation f and a for individual # 35 
-    ## Estimation f and a for individual # 36 
-    ## Estimation f and a for individual # 37 
-    ## Estimation f and a for individual # 38 
-    ## Estimation f and a for individual # 39 
-    ## Estimation f and a for individual # 40 
-    ## Estimation f and a for individual # 41 
-    ## Estimation f and a for individual # 42 
-    ## Estimation f and a for individual # 43 
-    ## Estimation f and a for individual # 44 
-    ## Estimation f and a for individual # 45 
-    ## Estimation f and a for individual # 46 
-    ## Estimation f and a for individual # 47 
-    ## Estimation f and a for individual # 48 
-    ## Estimation f and a for individual # 1 
-    ## Estimation f and a for individual # 2 
-    ## Estimation f and a for individual # 3 
-    ## Estimation f and a for individual # 4 
-    ## Estimation f and a for individual # 5 
-    ## Estimation f and a for individual # 6 
-    ## Estimation f and a for individual # 7 
-    ## Estimation f and a for individual # 8 
-    ## Estimation f and a for individual # 9 
-    ## Estimation f and a for individual # 10 
-    ## Estimation f and a for individual # 11 
-    ## Estimation f and a for individual # 12 
-    ## Estimation f and a for individual # 13 
-    ## Estimation f and a for individual # 14 
-    ## Estimation f and a for individual # 15 
-    ## Estimation f and a for individual # 16 
-    ## Estimation f and a for individual # 17 
-    ## Estimation f and a for individual # 18 
-    ## Estimation f and a for individual # 19 
-    ## Estimation f and a for individual # 20 
-    ## Estimation f and a for individual # 21 
-    ## Estimation f and a for individual # 22 
-    ## Estimation f and a for individual # 23 
-    ## Estimation f and a for individual # 24 
-    ## Estimation f and a for individual # 25 
-    ## Estimation f and a for individual # 26 
-    ## Estimation f and a for individual # 27 
-    ## Estimation f and a for individual # 28 
-    ## Estimation f and a for individual # 29 
-    ## Estimation f and a for individual # 30 
-    ## Estimation f and a for individual # 31 
-    ## Estimation f and a for individual # 32 
-    ## Estimation f and a for individual # 33 
-    ## Estimation f and a for individual # 34 
-    ## Estimation f and a for individual # 35 
-    ## Estimation f and a for individual # 36 
-    ## Estimation f and a for individual # 37 
-    ## Estimation f and a for individual # 38 
-    ## Estimation f and a for individual # 39 
-    ## Estimation f and a for individual # 40 
-    ## Estimation f and a for individual # 41 
-    ## Estimation f and a for individual # 42 
-    ## Estimation f and a for individual # 43 
-    ## Estimation f and a for individual # 44 
-    ## Estimation f and a for individual # 45 
-    ## Estimation f and a for individual # 46 
-    ## Estimation f and a for individual # 47 
-    ## Estimation f and a for individual # 48 
-    ## Estimation f and a for individual # 1 
-    ## Estimation f and a for individual # 2 
-    ## Estimation f and a for individual # 3 
-    ## Estimation f and a for individual # 4 
-    ## Estimation f and a for individual # 5 
-    ## Estimation f and a for individual # 6 
-    ## Estimation f and a for individual # 7 
-    ## Estimation f and a for individual # 8 
-    ## Estimation f and a for individual # 9 
-    ## Estimation f and a for individual # 10 
-    ## Estimation f and a for individual # 11 
-    ## Estimation f and a for individual # 12 
-    ## Estimation f and a for individual # 13 
-    ## Estimation f and a for individual # 14 
-    ## Estimation f and a for individual # 15 
-    ## Estimation f and a for individual # 16 
-    ## Estimation f and a for individual # 17 
-    ## Estimation f and a for individual # 18 
-    ## Estimation f and a for individual # 19 
-    ## Estimation f and a for individual # 20 
-    ## Estimation f and a for individual # 21 
-    ## Estimation f and a for individual # 22 
-    ## Estimation f and a for individual # 23 
-    ## Estimation f and a for individual # 24 
-    ## Estimation f and a for individual # 25 
-    ## Estimation f and a for individual # 26 
-    ## Estimation f and a for individual # 27 
-    ## Estimation f and a for individual # 28 
-    ## Estimation f and a for individual # 29 
-    ## Estimation f and a for individual # 30 
-    ## Estimation f and a for individual # 31 
-    ## Estimation f and a for individual # 32 
-    ## Estimation f and a for individual # 33 
-    ## Estimation f and a for individual # 34 
-    ## Estimation f and a for individual # 35 
-    ## Estimation f and a for individual # 36 
-    ## Estimation f and a for individual # 37 
-    ## Estimation f and a for individual # 38 
-    ## Estimation f and a for individual # 39 
-    ## Estimation f and a for individual # 40 
-    ## Estimation f and a for individual # 41 
-    ## Estimation f and a for individual # 42 
-    ## Estimation f and a for individual # 43 
-    ## Estimation f and a for individual # 44 
-    ## Estimation f and a for individual # 45 
-    ## Estimation f and a for individual # 46 
-    ## Estimation f and a for individual # 47 
-    ## Estimation f and a for individual # 48 
-    ## Estimation f and a for individual # 1 
-    ## Estimation f and a for individual # 2 
-    ## Estimation f and a for individual # 3 
-    ## Estimation f and a for individual # 4 
-    ## Estimation f and a for individual # 5 
-    ## Estimation f and a for individual # 6 
-    ## Estimation f and a for individual # 7 
-    ## Estimation f and a for individual # 8 
-    ## Estimation f and a for individual # 9 
-    ## Estimation f and a for individual # 10 
-    ## Estimation f and a for individual # 11 
-    ## Estimation f and a for individual # 12 
-    ## Estimation f and a for individual # 13 
-    ## Estimation f and a for individual # 14 
-    ## Estimation f and a for individual # 15 
-    ## Estimation f and a for individual # 16 
-    ## Estimation f and a for individual # 17 
-    ## Estimation f and a for individual # 18 
-    ## Estimation f and a for individual # 19 
-    ## Estimation f and a for individual # 20 
-    ## Estimation f and a for individual # 21 
-    ## Estimation f and a for individual # 22 
-    ## Estimation f and a for individual # 23 
-    ## Estimation f and a for individual # 24 
-    ## Estimation f and a for individual # 25 
-    ## Estimation f and a for individual # 26 
-    ## Estimation f and a for individual # 27 
-    ## Estimation f and a for individual # 28 
-    ## Estimation f and a for individual # 29 
-    ## Estimation f and a for individual # 30 
-    ## Estimation f and a for individual # 31 
-    ## Estimation f and a for individual # 32 
-    ## Estimation f and a for individual # 33 
-    ## Estimation f and a for individual # 34 
-    ## Estimation f and a for individual # 35 
-    ## Estimation f and a for individual # 36 
-    ## Estimation f and a for individual # 37 
-    ## Estimation f and a for individual # 38 
-    ## Estimation f and a for individual # 39 
-    ## Estimation f and a for individual # 40 
-    ## Estimation f and a for individual # 41 
-    ## Estimation f and a for individual # 42 
-    ## Estimation f and a for individual # 43 
-    ## Estimation f and a for individual # 44 
-    ## Estimation f and a for individual # 45 
-    ## Estimation f and a for individual # 46 
-    ## Estimation f and a for individual # 47 
-    ## Estimation f and a for individual # 48 
-    ## Estimation f and a for individual # 1 
-    ## Estimation f and a for individual # 2 
-    ## Estimation f and a for individual # 3 
-    ## Estimation f and a for individual # 4 
-    ## Estimation f and a for individual # 5 
-    ## Estimation f and a for individual # 6 
-    ## Estimation f and a for individual # 7 
-    ## Estimation f and a for individual # 8 
-    ## Estimation f and a for individual # 9 
-    ## Estimation f and a for individual # 10 
-    ## Estimation f and a for individual # 11 
-    ## Estimation f and a for individual # 12 
-    ## Estimation f and a for individual # 13 
-    ## Estimation f and a for individual # 14 
-    ## Estimation f and a for individual # 15 
-    ## Estimation f and a for individual # 16 
-    ## Estimation f and a for individual # 17 
-    ## Estimation f and a for individual # 18 
-    ## Estimation f and a for individual # 19 
-    ## Estimation f and a for individual # 20 
-    ## Estimation f and a for individual # 21 
-    ## Estimation f and a for individual # 22 
-    ## Estimation f and a for individual # 23 
-    ## Estimation f and a for individual # 24 
-    ## Estimation f and a for individual # 25 
-    ## Estimation f and a for individual # 26 
-    ## Estimation f and a for individual # 27 
-    ## Estimation f and a for individual # 28 
-    ## Estimation f and a for individual # 29 
-    ## Estimation f and a for individual # 30 
-    ## Estimation f and a for individual # 31 
-    ## Estimation f and a for individual # 32 
-    ## Estimation f and a for individual # 33 
-    ## Estimation f and a for individual # 34 
-    ## Estimation f and a for individual # 35 
-    ## Estimation f and a for individual # 36 
-    ## Estimation f and a for individual # 37 
-    ## Estimation f and a for individual # 38 
-    ## Estimation f and a for individual # 39 
-    ## Estimation f and a for individual # 40 
-    ## Estimation f and a for individual # 41 
-    ## Estimation f and a for individual # 42 
-    ## Estimation f and a for individual # 43 
-    ## Estimation f and a for individual # 44 
-    ## Estimation f and a for individual # 45 
-    ## Estimation f and a for individual # 46 
-    ## Estimation f and a for individual # 47 
-    ## Estimation f and a for individual # 48
+    F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=100, verbose = FALSE) 
 
     ## Warning in setSummary(h, probs = run.proba, recap.by.segments =
     ## recap.by.segments, : No cases (pheno = 2). HBD, FLOD and HFLOD are computed
     ## on all individuals
 
-We require that at least n.consecutive.marker markers are HBD before
-calling a HBD segment. Default value for n.consecutive.marker=5.
+Among the slots containg results of interest, we show here
+`F1@submap_summary` which contains a summmary of results accross submaps
+for all individuals:
 
-By default, the package only computes HBD, FLOD scores and HFLOD scores
-for affected individuals (phenotype = 2). So make sure that affected
-individuals have status 2. In the case of the HGDP-CEPH data, there is
-no information on phenotypes so phenotype is 1. We show below how deal
-with this situation.
+    head(F1@submap_summary, 10)
 
-Here we need to use argument list.id = "all" because we do not have
-phenotype information for the HGDP-CEPH individuals. By default,
-Fantasio focuses on affected individuals only (pheno = 2).
+    ##          FID       IID STATUS   SUBMAPS QUALITY      F_MIN       F_MAX
+    ## 1  HGDP00607 HGDP00607      1 100 / 100     100 0.01679166 0.034371219
+    ## 2  HGDP00608 HGDP00608      1 100 / 100     100 0.03497414 0.046201230
+    ## 3  HGDP00609 HGDP00609      1 100 / 100     100 0.03746029 0.051208506
+    ## 4  HGDP00610 HGDP00610      1 100 / 100     100 0.04211075 0.070544013
+    ## 5  HGDP00611 HGDP00611      1  19 / 100      19 0.00000000 0.015778896
+    ## 6  HGDP00612 HGDP00612      1 100 / 100     100 0.04989643 0.070509748
+    ## 7  HGDP00613 HGDP00613      1  99 / 100      99 0.00000000 0.009245574
+    ## 8  HGDP00614 HGDP00614      1 100 / 100     100 0.02695225 0.043496459
+    ## 9  HGDP00615 HGDP00615      1 100 / 100     100 0.08124877 0.098639612
+    ## 10 HGDP00616 HGDP00616      1 100 / 100     100 0.06140839 0.083460434
+    ##          F_MEAN    F_MEDIAN   A_MEDIAN   pLRT_MEDIAN INBRED pLRT_inf_0.05
+    ## 1  0.0239954604 0.023841525 0.14016758  9.459242e-26   TRUE           100
+    ## 2  0.0393159934 0.039171530 0.07163529  4.335122e-59   TRUE           100
+    ## 3  0.0427719968 0.042577607 0.12479358  5.469856e-51   TRUE           100
+    ## 4  0.0526702707 0.052619550 0.16005520  3.885552e-63   TRUE           100
+    ## 5  0.0061815718 0.004300554 0.35829659  2.953533e-02   TRUE            10
+    ## 6  0.0611221967 0.061294436 0.33582665  2.173077e-41   TRUE           100
+    ## 7  0.0001807201 0.000000000 0.01000000  1.000000e+00  FALSE             2
+    ## 8  0.0323134937 0.031705604 0.14156091  2.760207e-32   TRUE           100
+    ## 9  0.0891309688 0.088276525 0.09566205 2.127892e-124   TRUE           100
+    ## 10 0.0711661477 0.071027504 0.14850016  1.981602e-81   TRUE           100
 
-### 2.2 Hotspots by Segments
+If you are interested in the values of \\(f\\) and \\(a\\) accross the
+submaps, you can find them in `F1@estimation_summary`.
+
+The function also computed HBD probabilities that can be found in
+`F1@HBD_recap`, which are used to determine the position of HBD
+segments, which are recapitulated in `F1@HBDsegments`. It is required
+that at least `n.consecutive.marker` markers are HBD before calling a
+HBD segment. Default value is`n.consecutive.marker=5`.
+
+Moreover, FLOD and HFLOD linkage statistics are computed. The FLOD of
+each individual is in `F1@FLOD_recap`; they are used to compute the
+whole sample statistics HFLOD in `F1@HFLOD`.
+
+By default, the package only computes HBD, FLOD statistics and HFLOD
+statistics for affected individuals (phenotype = 2). In case there are
+no affected individuals, all individuals are taken into account (a
+warning is issued). The `list.id` argument allows to specify a list of
+individuals.
+
+Hotspots by Segments
+--------------------
 
 For the "Hotspots" method, the results can also be summarized globally
-for each segment using option recap.by.segments=TRUE. In that case,
-n.consecutive.marker should be set to 1.
+for each segment using option `recap.by.segments=TRUE`. In that case,
+`n.consecutive.marker` should be set to 1.
 
-    F2 <- Fantasio(bedmatrix=x.be, segments="Hotspots", recap.by.segments=TRUE, n.consecutive.marker=1, n=5)
+    F2 <- Fantasio(bedmatrix=x.be, segments="Hotspots", recap.by.segments=TRUE, 
+      n.consecutive.marker=1, n=100, verbose=FALSE)
 
-### 2.3 Distance
+    ## Warning in setSummary(h, probs = run.proba, recap.by.segments =
+    ## recap.by.segments, : No cases (pheno = 2). HBD, FLOD and HFLOD are computed
+    ## on all individuals
+
+Distance
+--------
 
     F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n=5)
 
-### 2.4 How to use the segment.option argument
+How to use the segment.option argument
+--------------------------------------
 
 In order to use the `segment.option` argument you need to pass a list of
 arguments, each variable name in the list must be an argument name in
@@ -574,55 +388,84 @@ minimum number of markers in each segment (`minMarkers = 0`). With the
 above command line, we impose to have at least 50 markers in a segment.
 Otherwise it is merged with the previous segment.
 
-5. Plotting
+Plotting results
+================
+
+We illustrate the plotting function on the `F1` object obtained with
+`segments="Hotspots"` and `F2` obtained with `segments="Hotspots"` and
+`recap.by.segments=TRUE`.
+
+HFLOD plots
 -----------
 
-### 5.1 HFLODManhattanPlot
+This plot shows the values of the HFLOD linkage statistics along the
+genome (contained in `F1@HFLOD`).
 
     HFLODManhattanPlot(F1)
 
 ![](Fantasio_files/figure-markdown_mmd/fig3-1.png)
 
--   The red lines that you see is the value of the moving average (more
-    information below).
+The points are the HFLOD values. In the case of `F1`, they are computed
+at every marker included in at least one submaps. The red line is the
+value of their moving average (see below).
 
-### 5.2 HFLOD for a chromosome
+To plot a single chromosome, use the following function:
 
     HFLODplotChr(F1, chr=15)
 
 ![](Fantasio_files/figure-markdown_mmd/fig4-1.png)
 
--   As you can see you have a red line plotted, it is the moving average
-    of the HFLOD, calculated on moving windows of 50 markers with the
-    rollmean function of the R package zoo. This allows checking the
+-   The red line plotted is the moving average of the HFLOD, calculated
+    on moving windows of 50 markers. This allows checking the
     consistency of HFLOD calculations (i.e. checking the fact that a
-    high HFLOD score is not due to one submap only). A moving average is
-    computed to remove the impact of a submap with a false positive
-    signal.
+    high HFLOD score is not due to one submap only).
 
 -   For method "Hotspots by segments", the use of the moving average
-    does not make much sense as results are already average over the
-    snps of a segment between hospots regions. We recommend using
-    MA=FALSE.
+    does not make much sense as results are already averaged over the
+    SNPs of a segment between hospots regions. We recommend using
+    `MA=FALSE` as this:
 
-### 5.3 HBD plot for a chromosome
+<!-- -->
+
+    HFLODplotChr(F2, chr=15, MA=FALSE)
+
+![](Fantasio_files/figure-markdown_mmd/fig4bis-1.png)
+
+HBD plots
+---------
+
+The HBD plots allow to visualize the positions of the HBD segments on
+the genome, contained in `F1@HBDsegments`. You can plot multiple
+individuals for one chromosome (by default, all individuals with \\(f\\)
+significantly positive are plotted), as illustrated below with `F1` and
+`F2`:
 
     HBDplotChr(F1, chr=15)
 
 ![](Fantasio_files/figure-markdown_mmd/fig1-1.png)
 
-### 5.4 HBD plot for an individual
+    HBDplotChr(F2, chr=15)
+
+![](Fantasio_files/figure-markdown_mmd/fig1bis-1.png)
+
+It is also possible to look at all HBD segments of a given individual
+(again we show the results for `F1` and `F2`):
 
     HBDplotId(F1, individual.id = "HGDP00649", family.id = "HGDP00649")
 
 ![](Fantasio_files/figure-markdown_mmd/fig2-1.png)
 
-3. Step by step usage of the package Fantasio
----------------------------------------------
+    HBDplotId(F2, individual.id = "HGDP00649", family.id = "HGDP00649")
 
-### 3.1 Hotspots
+![](Fantasio_files/figure-markdown_mmd/fig2bis-1.png)
 
-#### 3.1.1 Creation of the segments list
+Step by step usage of the package Fantasio
+==========================================
+
+Hotspots
+--------
+
+### Creation of the segments list
 
 We will now create segments, which will be use to create the submaps
 later, further explication below, for now use this command :
@@ -673,7 +516,7 @@ This function creates a dataframe with three colums :
 -   number\_of\_segments
 -   number\_of\_marker
 
-#### 3.1.2 Creation of the submaps and computation
+### Creation of the submaps and computation
 
 We will now head toward the creation of submaps using the following
 commands :
@@ -693,7 +536,7 @@ different elements of it with :
 
     str(F1) #careful it can become huge depending on your data sizes
 
-#### 3.1.3 Descrition of the object F1
+### Descrition of the object F1
 
 This object contains all the results of the different computations
 executed during the process of creating n submaps. Here is a complete
@@ -782,20 +625,20 @@ description of each structure in this object :
 
     head(F1@submap_summary)
 
-    ##         FID       IID STATUS SUBMAPS QUALITY      F_MIN      F_MAX
-    ## 1 HGDP00607 HGDP00607      1   5 / 5     100 0.02213075 0.02580035
-    ## 2 HGDP00608 HGDP00608      1   5 / 5     100 0.03659709 0.04392823
-    ## 3 HGDP00609 HGDP00609      1   5 / 5     100 0.03957565 0.04594604
-    ## 4 HGDP00610 HGDP00610      1   5 / 5     100 0.04952580 0.05812704
-    ## 5 HGDP00611 HGDP00611      1   1 / 5      20 0.00848708 0.00848708
-    ## 6 HGDP00612 HGDP00612      1   5 / 5     100 0.05295574 0.07045992
-    ##       F_MEAN   F_MEDIAN   A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
-    ## 1 0.02368660 0.02264329 0.15128382 1.583917e-25   TRUE             5
-    ## 2 0.03870298 0.03724499 0.06022584 1.279736e-57   TRUE             5
-    ## 3 0.04335792 0.04422609 0.13740740 2.853181e-49   TRUE             5
-    ## 4 0.05257956 0.05087524 0.16104334 2.183219e-63   TRUE             5
-    ## 5 0.00848708 0.00848708 0.88202389 1.860409e-03   TRUE             1
-    ## 6 0.06191400 0.06112593 0.33248283 7.982444e-38   TRUE             5
+    ##         FID       IID STATUS SUBMAPS QUALITY       F_MIN       F_MAX
+    ## 1 HGDP00607 HGDP00607      1   5 / 5     100 0.023554131 0.025296133
+    ## 2 HGDP00608 HGDP00608      1   5 / 5     100 0.037625736 0.039117729
+    ## 3 HGDP00609 HGDP00609      1   5 / 5     100 0.038244878 0.051365326
+    ## 4 HGDP00610 HGDP00610      1   5 / 5     100 0.046591032 0.059201269
+    ## 5 HGDP00611 HGDP00611      1   1 / 5      20 0.004953602 0.004953602
+    ## 6 HGDP00612 HGDP00612      1   5 / 5     100 0.056078937 0.065441519
+    ##        F_MEAN    F_MEDIAN   A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
+    ## 1 0.024622216 0.025137092 0.15479649 1.240037e-27   TRUE             5
+    ## 2 0.038221978 0.038256615 0.06928447 8.307035e-56   TRUE             5
+    ## 3 0.044232489 0.044357765 0.13544907 4.967350e-49   TRUE             5
+    ## 4 0.052822097 0.054779642 0.17294471 1.477215e-61   TRUE             5
+    ## 5 0.004953602 0.004953602 0.53778936 1.835737e-02   TRUE             1
+    ## 6 0.058960763 0.057807282 0.31697145 1.291807e-40   TRUE             5
 
 -   bySegments : a boolean indicating whether the creation of summary
     statistics for HBD and FLOD has to be made by segments or not. By
@@ -846,7 +689,8 @@ description of each structure in this object :
 
 -   unit : the unit of the marker (cM or Bp).
 
-### 3.2 Hotspots by segments
+Hotspots by segments
+--------------------
 
 We implemented a second inner method for the "Hotspots" method. The only
 paramater that changes is `recap.by.segments`, it is put to TRUE.
@@ -861,11 +705,11 @@ is hence only one value for a segment delimited by hotspots. So we also
 recommend to set n.consecutive.marker to 1. Since results over multiple
 markers have already been averaged.
 
-#### 3.2.1 Creation of the segments list
+### Creation of the segments list
 
 We use the same segment list that is used before (s1).
 
-#### 3.2.2 Creation of the submaps and computation
+### Creation of the submaps and computation
 
 As said before the only argument that changes is "recap.by.segments", it
 is put to TRUE. And we recommend to adjust "n.consecutive.marker".
@@ -874,9 +718,10 @@ is put to TRUE. And we recommend to adjust "n.consecutive.marker".
     F2 <- festim(F2)
     F2 <- setSummary(F2, recap.by.segments = TRUE, n.consecutive.marker = 1, list.id = "all")
 
-### 3.3 Distance
+Distance
+--------
 
-#### 3.3.1 Creation of the segments list
+### Creation of the segments list
 
 We will now create segments, which will be used to create the submaps
 later :
@@ -897,9 +742,9 @@ which will contain three slots :
 
 -   gap : the value of the minimal fix step required between sampled
     markers of a submap
--   unit : the unit of the markers ("cM" or "Bp")
--   snpsSegments : for each chromosome, the list of segments; each
-    segment being a list of SNP indexes
+-   unit : the unit of the markers ("cM" or "Bp") snpsSegments : for
+    each chromosome, the
+-   list of segments; each segment being a list of SNP indexes
 
 You can watch a summary of what was done with :
 
@@ -911,7 +756,7 @@ This function creates a dataframe with three colums :
 -   number\_of\_segments
 -   number\_of\_marker
 
-#### 3.3.2 Creation of the submaps and computation
+### Creation of the submaps and computation
 
 We will now head toward the creation of submaps using the following
 commands :
@@ -925,8 +770,8 @@ different elements of it with :
 
     str(F3) #careful it can become huge depending on your data sizes
 
-4. Parallelism with the package
--------------------------------
+Parallelism with the package
+============================
 
 We implemented a paralellism method to make the creation of the submaps
 more efficient. We paralellized the creation of the submaps, that is to
@@ -936,9 +781,7 @@ support the usage of multiple CPU.
 Use the `n.cores` argument, i.e the number of CPU that will be used to
 make the differents submaps in the following functions :
 
--   Fantasio
--   makeAtlasByHotspots
--   makeAtlasByDistance
+-   Fantasio makeAtlasByHotspots makeAtlasByDistance
 
 <!-- -->
 
