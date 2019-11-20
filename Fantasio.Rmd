@@ -188,16 +188,14 @@ summarizing the results for each snp that appears in a submap.
 F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=5, verbose = FALSE) 
 ```
 
-Among the slots containg results of interest, the slot `F1@marker_summary`
-gives **to be completed**
+The function `markerRepresentation` gives for each marker of the original
+bed matrix the number of times it has been selected. It can be used in
+conjonction with `table` to obtain a summary of the number of markers
+never seen, seen once, twice, etc:
 
 ```{r}
-F1@marker_summary
-```
-
-Also **to be completed**
-```{r}
-head(markerRepresentation(F1))
+head(markerRepresentation(F1), 10)
+table(markerRepresentation(F1)$Freq)
 ```
 
 The slot `F1@submap_summary` contains
@@ -236,8 +234,17 @@ F2 <- Fantasio(bedmatrix=x.be, segments="Hotspots", recap.by.segments=TRUE,
 
 ## Distance
 
-```{r eval=FALSE}
-F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n=5)
+```{r eval=TRUE}
+F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n=5, verbose = FALSE)
+```
+
+In addition to all the above mentionned summaries, the function `markerSummary` returns the
+number of SNPs in each submap. Note that when `segments = "Hotspots", it's always the number of
+hotspot segments, but here it varies from submap to submap.
+
+
+```{r eval=TRUE}
+head(markerSummary(F3))
 ```
 
 ## How to use the segment.option argument
@@ -420,15 +427,6 @@ str(F1@likelihood_summary)
 
 ```{r eval=FALSE}
 str(F1@estimation_summary)
-```
-
-* marker_summary : a dataframe, which gives the number of markers and the number of times it has been picked, 
-    * number_of_time_picked
-    * number_of_marker
-
-
-```{r eval=FALSE}
-str(F1@marker_summary)
 ```
 
 * submaps_summary : a dataframe which gives several informations about the a and f computed over the submaps. The dataframe contains 13 columns: 
