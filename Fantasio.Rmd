@@ -95,7 +95,7 @@ Linkage evidence is then evaluated over the entire set I of inbred cases by comp
 HFLOD(m,$\alpha$), at each marker _m_, in presence of genetic heterogeneity using a parameter
 $\alpha$ (2):
 
-$$HFLOD(m,\alpha)=\sum log_{10} \left[\alpha.\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_{m,s}^{(i)} | H_{0}\right)}+ (1 - \alpha)\right ]= \sum log_{10} \left[\alpha . exp \left(FLOD^{(i)}(m)*log(10)\right)+(1-\alpha)\right] $$
+$$HFLOD(m,\alpha)=\sum log_{10} \left[\alpha.\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_{m,s}^{(i)} | H_{0}\right)}+ (1 - \alpha)\right ]= \sum log_{10} \left[\alpha . exp \left(FLOD^{(i)}(m) \times \log(10)\right)+(1-\alpha)\right] $$
 
 This heterogeneity score is then maximized over $\alpha$ to evaluate the evidence of linkage at
 marker _m_ where $\alpha$ is the estimate of the proportion of cases linked to this locus (3):
@@ -208,20 +208,14 @@ F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots",
                verbose = FALSE) 
 ```
 
-In the call to Fantasio, we can pass a list of options for the segment
-construction ; here we pass `hotspots = hotspot_hg18`, as the HGDP-CEPH
-SNP positions are on the hg18/b36 reference as mentionned above.
-
-Among the slots containg results of interest, the slot `F1@marker_summary`
-gives **to be completed**
+The function `markerRepresentation` gives for each marker of the original
+bed matrix the number of times it has been selected. It can be used in
+conjonction with `table` to obtain a summary of the number of markers
+never seen, seen once, twice, etc:
 
 ```{r}
-F1@marker_summary
-```
-
-Also **to be completed**
-```{r}
-head(markerRepresentation(F1))
+head(markerRepresentation(F1), 10)
+table(markerRepresentation(F1)$Freq)
 ```
 
 The slot `F1@submap_summary` contains
@@ -261,8 +255,17 @@ F2 <- Fantasio(bedmatrix = x.be, segments = "Hotspots",
 
 ## Distance
 
-```{r eval=FALSE}
-F3 <- Fantasio(bedmatrix = x.be, segments = "Distance", n = 5)
+```{r eval=TRUE}
+F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n = 5, verbose = FALSE)
+```
+
+In addition to all the above mentionned summaries, the function `markerSummary` returns the
+number of SNPs in each submap. Note that when `segments = "Hotspots", it's always the number of
+hotspot segments, but here it varies from submap to submap.
+
+
+```{r eval=TRUE}
+head(markerSummary(F3))
 ```
 
 ## How to use the `segment.option` argument
@@ -443,15 +446,6 @@ str(F1@likelihood_summary)
 
 ```{r eval=FALSE}
 str(F1@estimation_summary)
-```
-
-* marker_summary : a dataframe, which gives the number of markers and the number of times it has been picked, 
-    * number_of_time_picked
-    * number_of_marker
-
-
-```{r eval=FALSE}
-str(F1@marker_summary)
 ```
 
 * submaps_summary : a dataframe which gives several informations about the a and f computed over the submaps. The dataframe contains 13 columns: 
