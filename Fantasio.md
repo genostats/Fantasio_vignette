@@ -3,7 +3,7 @@ title: "Fantasio"
 subtitle: 'Version 0.1'
 author: "Isuru HAUPE & Marie MICHEL"
 version: 0.1
-date: "2019-06-28"
+date: "2019-11-20"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
@@ -14,8 +14,8 @@ vignette: >
 ---
 
 author: Isuru HAUPE & Marie MICHEL
-date: 2019-06-28
-meta-json: {"date":"2019-06-28","subtitle":"Version 0.1","output":"rmarkdown::html\\_vignette","version":"0.1","author":"Isuru HAUPE & Marie MICHEL","title":"Fantasio","vignette":"% % % % %"}
+date: 2019-11-20
+meta-json: {"date":"2019-11-20","subtitle":"Version 0.1","output":"rmarkdown::html\\_vignette","version":"0.1","author":"Isuru HAUPE & Marie MICHEL","title":"Fantasio","vignette":"% % % % %"}
 output: rmarkdown::html\_vignette
 subtitle: Version 0.1
 title: Fantasio
@@ -311,20 +311,20 @@ markers never seen, seen once, twice, etc:
     ##            id chr     pos       dist Freq
     ## 1   rs3094315   1  742429 0.09162711    0
     ## 2  rs12562034   1  758311 0.09918407    0
-    ## 3   rs3934834   1  995669 0.49630053    0
+    ## 3   rs3934834   1  995669 0.49630053    1
     ## 4   rs9442372   1 1008567 0.50394850    0
     ## 5   rs3737728   1 1011278 0.50800870    0
     ## 6  rs11260588   1 1011521 0.50867275    0
     ## 7   rs9442398   1 1011558 0.50878962    0
     ## 8   rs6687776   1 1020428 0.54737207    0
     ## 9   rs9651273   1 1021403 0.54793723    0
-    ## 10  rs4970405   1 1038818 0.55291100    0
+    ## 10  rs4970405   1 1038818 0.55291100    1
 
     table(markerRepresentation(F1)$Freq)
 
     ## 
     ##      0      1      2      3      4      5 
-    ## 609571  45833   4344    741    134    295
+    ## 609739  45526   4474    724    166    289
 
 The slot `F1@submap_summary` contains a summmary of results accross
 submaps for all individuals:
@@ -332,27 +332,27 @@ submaps for all individuals:
     head(F1@submap_summary, 10)
 
     ##          FID       IID STATUS SUBMAPS QUALITY      F_MIN      F_MAX
-    ## 1  HGDP00607 HGDP00607      1       5     100 0.01518434 0.03257575
-    ## 2  HGDP00608 HGDP00608      1       5     100 0.03604983 0.04426785
-    ## 3  HGDP00609 HGDP00609      1       5     100 0.04312059 0.04860821
-    ## 4  HGDP00610 HGDP00610      1       5     100 0.04401858 0.05961656
-    ## 5  HGDP00611 HGDP00611      1       1      20 0.02490008 0.02490008
-    ## 6  HGDP00612 HGDP00612      1       5     100 0.05371608 0.06379560
-    ## 7  HGDP00613 HGDP00613      1       4      80 0.00000000 0.00000000
-    ## 8  HGDP00614 HGDP00614      1       5     100 0.02913594 0.03884595
-    ## 9  HGDP00615 HGDP00615      1       5     100 0.08462442 0.09167799
-    ## 10 HGDP00616 HGDP00616      1       5     100 0.06818923 0.07438609
+    ## 1  HGDP00607 HGDP00607      1       5     100 0.02221067 0.02702339
+    ## 2  HGDP00608 HGDP00608      1       5     100 0.03645742 0.04152166
+    ## 3  HGDP00609 HGDP00609      1       5     100 0.03760051 0.04533853
+    ## 4  HGDP00610 HGDP00610      1       5     100 0.04796684 0.05909382
+    ## 5  HGDP00611 HGDP00611      1       0      NA         NA         NA
+    ## 6  HGDP00612 HGDP00612      1       5     100 0.05658042 0.07078135
+    ## 7  HGDP00613 HGDP00613      1       5     100 0.00000000 0.00000000
+    ## 8  HGDP00614 HGDP00614      1       5     100 0.03216280 0.04285624
+    ## 9  HGDP00615 HGDP00615      1       5     100 0.08685910 0.09701213
+    ## 10 HGDP00616 HGDP00616      1       5     100 0.06545140 0.07911302
     ##        F_MEAN   F_MEDIAN   A_MEDIAN   pLRT_MEDIAN INBRED pLRT_inf_0.05
-    ## 1  0.02113917 0.01732085 0.10465202  1.092893e-25   TRUE             5
-    ## 2  0.03850661 0.03771460 0.07515835  2.724017e-56   TRUE             5
-    ## 3  0.04576054 0.04606134 0.12890667  2.947722e-56   TRUE             5
-    ## 4  0.05325645 0.05450831 0.17332393  6.475594e-61   TRUE             5
-    ## 5  0.02490008 0.02490008 0.87109604  2.909188e-07   TRUE             1
-    ## 6  0.05805642 0.05836472 0.32193643  3.072248e-41   TRUE             5
+    ## 1  0.02419026 0.02404125 0.15284857  1.106833e-24   TRUE             5
+    ## 2  0.03923276 0.03969245 0.06757960  2.388107e-57   TRUE             5
+    ## 3  0.04178235 0.04155599 0.11241927  1.559710e-49   TRUE             5
+    ## 4  0.05396796 0.05343069 0.17368374  1.249602e-65   TRUE             5
+    ## 5          NA         NA         NA            NA     NA            NA
+    ## 6  0.06184768 0.06105814 0.34430441  1.952955e-46   TRUE             5
     ## 7  0.00000000 0.00000000 0.01000000  1.000000e+00  FALSE             0
-    ## 8  0.03453203 0.03360089 0.15385938  4.542748e-34   TRUE             5
-    ## 9  0.08761414 0.08505159 0.09785348 2.225154e-123   TRUE             5
-    ## 10 0.07072148 0.07027205 0.14472321  3.146228e-84   TRUE             5
+    ## 8  0.03610189 0.03512194 0.16160757  3.616213e-34   TRUE             5
+    ## 9  0.09016617 0.08855767 0.09875555 4.152072e-121   TRUE             5
+    ## 10 0.07223137 0.07208444 0.16078737  1.133383e-80   TRUE             5
 
 If you are interested in the values of \\(f\\) and \\(a\\) accross the
 submaps, you can find them in `F1@estimation_summary`.
@@ -402,11 +402,11 @@ segments, but here it varies from submap to submap.
     head(markerSummary(F3))
 
     ##          number_of_markers_used
-    ## Submap 1                   6221
-    ## Submap 2                   6247
-    ## Submap 3                   6236
-    ## Submap 4                   6216
-    ## Submap 5                   6229
+    ## Submap 1                   6248
+    ## Submap 2                   6239
+    ## Submap 3                   6251
+    ## Submap 4                   6238
+    ## Submap 5                   6246
 
 How to use the segment.option argument
 --------------------------------------
@@ -655,20 +655,20 @@ description of each structure in this object :
 
     head(F1@submap_summary)
 
-    ##         FID       IID STATUS SUBMAPS QUALITY      F_MIN      F_MAX
-    ## 1 HGDP00607 HGDP00607      1       5     100 0.01774510 0.02258418
-    ## 2 HGDP00608 HGDP00608      1       5     100 0.03777834 0.04483457
-    ## 3 HGDP00609 HGDP00609      1       5     100 0.03867672 0.04752368
-    ## 4 HGDP00610 HGDP00610      1       5     100 0.05002053 0.06005744
-    ## 5 HGDP00611 HGDP00611      1       0      NA         NA         NA
-    ## 6 HGDP00612 HGDP00612      1       5     100 0.05702920 0.06499281
-    ##       F_MEAN   F_MEDIAN  A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
-    ## 1 0.02029768 0.02029054 0.1204826 1.399920e-23   TRUE             5
-    ## 2 0.04009542 0.03904313 0.0896712 5.420676e-58   TRUE             5
-    ## 3 0.04226154 0.03967114 0.1244590 4.944954e-49   TRUE             5
-    ## 4 0.05540552 0.05572329 0.1833339 1.046299e-59   TRUE             5
-    ## 5         NA         NA        NA           NA     NA            NA
-    ## 6 0.06033014 0.05958620 0.2955896 4.304676e-44   TRUE             5
+    ##         FID       IID STATUS SUBMAPS QUALITY       F_MIN       F_MAX
+    ## 1 HGDP00607 HGDP00607      1       5     100 0.018808001 0.030729432
+    ## 2 HGDP00608 HGDP00608      1       5     100 0.034927374 0.039113348
+    ## 3 HGDP00609 HGDP00609      1       5     100 0.040677491 0.046541212
+    ## 4 HGDP00610 HGDP00610      1       5     100 0.048740027 0.057538174
+    ## 5 HGDP00611 HGDP00611      1       1      20 0.009516395 0.009516395
+    ## 6 HGDP00612 HGDP00612      1       5     100 0.054196171 0.063212983
+    ##        F_MEAN    F_MEDIAN   A_MEDIAN  pLRT_MEDIAN INBRED pLRT_inf_0.05
+    ## 1 0.023873494 0.023436308 0.14042318 2.824245e-28   TRUE             5
+    ## 2 0.037267716 0.038122466 0.05692614 1.371325e-58   TRUE             5
+    ## 3 0.042733282 0.042054182 0.11908595 7.107909e-50   TRUE             5
+    ## 4 0.052431864 0.049542716 0.15603122 7.391494e-62   TRUE             5
+    ## 5 0.009516395 0.009516395 0.67035231 7.614932e-03   TRUE             1
+    ## 6 0.058976973 0.058657310 0.31043986 2.398926e-43   TRUE             5
 
 -   bySegments : a boolean indicating whether the creation of summary
     statistics for HBD and FLOD has to be made by segments or not. By
