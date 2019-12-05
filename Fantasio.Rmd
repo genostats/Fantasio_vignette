@@ -1,7 +1,7 @@
 ---
 title: "Fantasio"
 subtitle: 'Version 0.1'
-author: "Isuru HAUPE & Marie MICHEL"
+author: "Isuru HAUPE, Marie MICHEL, Anne-Louise Leutenegger, Hervé Perdry"
 version: 0.1
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -204,7 +204,7 @@ summarizing the results for each snp that appears in a submap.
 
 ```{r}
 F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", 
-               segment.options = list(hotspots = hotspot_hg18), n = 5, 
+               segment.options = list(hotspots = hotspot_hg18), n = 100, 
                verbose = FALSE) 
 ```
 
@@ -249,14 +249,14 @@ For the "Hotspots" method, the results can also be summarized globally for each 
 
 ```{r}
 F2 <- Fantasio(bedmatrix = x.be, segments = "Hotspots", 
-               segment.options = list(hotspots = hotspot_hg18), n = 5, 
+               segment.options = list(hotspots = hotspot_hg18), n = 100, 
                recap.by.segments = TRUE, n.consecutive.marker = 1, verbose = FALSE)
 ```
 
 ## Distance
 
 ```{r eval=TRUE}
-F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n = 5, verbose = FALSE)
+F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n = 100, verbose = FALSE)
 ```
 
 In addition to all the above mentionned summaries, the function `markerSummary` returns the
@@ -591,7 +591,7 @@ in the functions `Fantasio`, `makeAtlasByHotspots`, `makeAtlasByDistance` :
 
 ```{r eval=FALSE}
 F1 <- Fantasio(bedmatrix = x.be, segments = "Hotspots", 
-               segment.options = list(hotspots = hotspot_hg18), n = 5, 
+               segment.options = list(hotspots = hotspot_hg18), n = 100, 
                verbose = FALSE, n.cores = 10)
 ```
 
