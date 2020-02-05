@@ -1,7 +1,7 @@
 ---
 title: "Fantasio"
 subtitle: 'Version 0.1'
-author: "Isuru HAUPE & Marie MICHEL"
+author: "Isuru HAUPE, Marie MICHEL, Anne-Louise Leutenegger, Hervé Perdry"
 version: 0.1
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -95,7 +95,7 @@ Linkage evidence is then evaluated over the entire set I of inbred cases by comp
 HFLOD(m,$\alpha$), at each marker _m_, in presence of genetic heterogeneity using a parameter
 $\alpha$ (2):
 
-$$HFLOD(m,\alpha)=\sum log_{10} \left[\alpha.\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_{m,s}^{(i)} | H_{0}\right)}+ (1 - \alpha)\right ]= \sum log_{10} \left[\alpha . exp \left(FLOD^{(i)}(m)*log(10)\right)+(1-\alpha)\right] $$
+$$HFLOD(m,\alpha)=\sum log_{10} \left[\alpha.\frac{P\left(Y_{m,s}^{(i)} | H_{1}\right)}{P\left(Y_{m,s}^{(i)} | H_{0}\right)}+ (1 - \alpha)\right ]= \sum log_{10} \left[\alpha . exp \left(FLOD^{(i)}(m) \times \log(10)\right)+(1-\alpha)\right] $$
 
 This heterogeneity score is then maximized over $\alpha$ to evaluate the evidence of linkage at
 marker _m_ where $\alpha$ is the estimate of the proportion of cases linked to this locus (3):
@@ -138,15 +138,33 @@ filepath <- system.file("extdata", "hgdp_ceph.bed", package="HGDP.CEPH")
 x <- read.bed.matrix(filepath)
 ```
 
-The object `x` is a bed.matrix object (see gaston package for details).
-
-We are going to work on the Bedouin population, so after updating the stats in `x` (this adds several informations
-such as allele frequencies, etc), we select this population:
-
+The object `x` is a bed.matrix object (see gaston package for details). The
+statistics on SNPs and individual callrates, etc, have not been computed;
+run
 ```{r}
 x <- set.stats(x)
+```
+to add them in the bed matrix. These data have genetic distances (centiMorgans) 
+set in the `@snps` slot, column `dist`:
+```{r}
+head(x@snps)
+```
+
+Most datasets come with physical positions (column `pos` in `@snps`), but no genetic distance.
+They can be added with Gaston. First, you need install the HumanGeneticMap package with
+`install.packages("HumanGeneticMap", repos="https://genostats.github.io/R/")`. 
+Then, you would run
+```{r eval = FALSE}
+x <- set.dist(x, HumanGeneticMap::genetic.map.b36)
+```
+as the SNP positions in these data are on hg18/b36 reference.
+
+We are going to work on the Bedouin population. To select this population run:
+
+```{r}
 x.be <- select.inds(x, population == "Bedouin")
 ```
+
 
 # Running Fantasio
 
@@ -185,7 +203,9 @@ By default, the submaps are created using the file of recombination hotspots and
 summarizing the results for each snp that appears in a submap.
 
 ```{r}
-F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=5, verbose = FALSE) 
+F1 <- Fantasio(bedmatrix=x.be, segments="Hotspots", 
+               segment.options = list(hotspots = hotspot_hg18), n = 100, 
+               verbose = FALSE) 
 ```
 
 The function `markerRepresentation` gives for each marker of the original
@@ -228,14 +248,15 @@ For the "Hotspots" method, the results can also be summarized globally for each 
 `recap.by.segments=TRUE`. In that case, `n.consecutive.marker` should be set to 1. 
 
 ```{r}
-F2 <- Fantasio(bedmatrix=x.be, segments="Hotspots", recap.by.segments=TRUE, 
-  n.consecutive.marker=1, n=5, verbose=FALSE)
+F2 <- Fantasio(bedmatrix = x.be, segments = "Hotspots", 
+               segment.options = list(hotspots = hotspot_hg18), n = 100, 
+               recap.by.segments = TRUE, n.consecutive.marker = 1, verbose = FALSE)
 ```
 
 ## Distance
 
 ```{r eval=TRUE}
-F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n=5, verbose = FALSE)
+F3 <- Fantasio(bedmatrix=x.be, segments="Distance", n = 100, verbose = FALSE)
 ```
 
 In addition to all the above mentionned summaries, the function `markerSummary` returns the
@@ -247,7 +268,7 @@ hotspot segments, but here it varies from submap to submap.
 head(markerSummary(F3))
 ```
 
-## How to use the segment.option argument
+## How to use the `segment.option` argument
 
 In order to use the `segment.option` argument you need to pass a list of arguments, each variable
 name in the list must be an argument name in the function. The function that will be called is
@@ -256,14 +277,12 @@ either `createsSegmentsListByDistance` if `segments` argument is equal to "Dista
 be passed to it. So refer to these functions for possible arguments.
 
 ```{r eval=FALSE}
-l <- list(minMarkers=50) #default is 0
-F1.l <- Fantasio(bedmatrix=x.be, segments="Hotspots", segment.options=l)
+l <- list(hotspots = hotspot_hg18, minMarkers = 50) # default is 0
+F4 <- Fantasio(bedmatrix = x.be, segments = "Hotspots", segment.options = l)
 ```
 In the case of "Hotspots", by default, we do not require to have a minimum number of markers in each
 segment (`minMarkers = 0`).  With the above command line, we impose to have at least 50 markers in a
 segment. Otherwise it is merged with the previous segment.
-
-
 
 
 
@@ -346,7 +365,7 @@ HBDplotId(F2, individual.id = "HGDP00649", family.id = "HGDP00649")
 We will now create segments, which will be use to create the submaps later, further explication below, for now use this command :
  
 ```{r}
-s1 <- segmentsListByHotspots(x.be)
+s1 <- segmentsListByHotspots(x.be, hotspots = hotspot_hg18)
 ```
 
 This function creates a list of chromosomes, in each, you have a list of several segments created
@@ -558,9 +577,8 @@ F3 <- setSummary(F3, list.id = "all")
 The variable submaps becomes an submapsList object, you can watch the different elements of it with : 
 
 ```{r eval=FALSE}
-str(F3) #careful it can become huge depending on your data sizes
+str(F3) # careful it can become huge depending on your data sizes
 ```
-
 
 # Parallelism with the package
 
@@ -569,12 +587,12 @@ paralellized the creation of the submaps, that is to say, the selection of marke
 have an environment that can support the usage of multiple CPU. 
 
 Use the `n.cores` argument, i.e the number of CPU that will be used to make the differents submaps
-in the following functions : 
-  
-* Fantasio makeAtlasByHotspots makeAtlasByDistance
+in the functions `Fantasio`, `makeAtlasByHotspots`, `makeAtlasByDistance` :
 
 ```{r eval=FALSE}
-F6 <- Fantasio(bedmatrix=x.be, segments="Hotspots", n=5, verbose=FALSE, n.cores=10)
+F1 <- Fantasio(bedmatrix = x.be, segments = "Hotspots", 
+               segment.options = list(hotspots = hotspot_hg18), n = 100, 
+               verbose = FALSE, n.cores = 10)
 ```
 
 
